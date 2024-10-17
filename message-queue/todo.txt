@@ -1,1 +1,1 @@
-itten lakik a rabbitmq
+right now we dont need this folder
