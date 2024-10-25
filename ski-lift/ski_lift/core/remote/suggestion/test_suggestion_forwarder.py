@@ -11,8 +11,12 @@ from time import sleep
 class TestSuggestionForwarder(SuggestionForwarder):
     
     def handle_suggestions(self) -> None:
+        sleep_time = 0
         while not self._stop_event.is_set():
-            sleep(random.randint(5, 20))
+            sleep(1)
+            if sleep_time < 10:
+                sleep_time += 1
+                continue
             self._view.display_suggestion(
                 Suggestion(
                     sender_card_number='xyz123',
@@ -21,4 +25,5 @@ class TestSuggestionForwarder(SuggestionForwarder):
                     message='This is a suggestion sent.'
                 )
             )
+            sleep_time = 0
 

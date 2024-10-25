@@ -16,8 +16,12 @@ from time import sleep
 class TestEmergencyStopper(SuggestionForwarder):
 
     def handle_suggestions(self) -> None:
+        sleep_time = 0
         while not self._stop_event.is_set():
-            sleep(60)
+            sleep(1)
+            if sleep_time < 60:
+                sleep_time+=1
+                continue
             self._view.display_suggestion(
                 Suggestion(
                     sender_card_number='xyz123',
@@ -28,3 +32,4 @@ class TestEmergencyStopper(SuggestionForwarder):
                 reset_input=False,
             )
             self._view._controller.execute(CommandDescriptorFactory().create_emergency_stop(user_card='xyz', delay=5))
+            sleep_time = 0
