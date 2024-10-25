@@ -1,5 +1,8 @@
 ## Ignore Visual Studio temporary files
 
+# Ignore macOS specific
+.DS_Store
+
 # User-specific files
 *.rsuser
 *.suo
