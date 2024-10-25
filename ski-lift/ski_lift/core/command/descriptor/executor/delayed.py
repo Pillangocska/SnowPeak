@@ -84,10 +84,10 @@ class DelayedCommandExecutor(CommandExecutor):
             with self._lock:
                 to_keep = []
                 for command in self._delayed_commands:
-                    if self.is_delayed_command(command):
+                    if self.is_delayed(command):
                         to_keep.append(command)
                     else:
-                        self.process(command)
+                        self.execute(command)
                 self._delayed_commands = to_keep
 
     def _create_delayed_result(self, command: CommandDescriptor) -> CommandResult:
