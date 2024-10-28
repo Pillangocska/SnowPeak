@@ -33,9 +33,9 @@ def main() -> int:
     # start thread that handles delayed commands
     controller.start()
     # start thread that sends dummy suggestions
-    suggestion_handler.start()
+    #suggestion_handler.start()
     # start thread that sends emergency stops every minute
-    remote_emergency_stopper.start()
+    #remote_emergency_stopper.start()
     cli.start_handling_user_inputs()
 
     suggestion_handler.stop()

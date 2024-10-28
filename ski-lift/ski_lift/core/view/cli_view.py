@@ -11,14 +11,14 @@ from tests.entity import command
 DEFAULT_HELP_TEXT: str = """
 Available commands:
 
-    insert_card <card_id> 
+    insert_card <card_id>
         - Inserts a card into the system, using the specified <card_id>.
-        
+
     remove_card
         - Removes the currently inserted card from the system.
-        
+
     change_state <state>
-        - Changes the engine state to the specified <state>. 
+        - Changes the engine state to the specified <state>.
           Valid states include MAX_STEAM, FULL_STEAM, HALF_STEAM, and STOPPED.
 
     display_status
@@ -26,7 +26,7 @@ Available commands:
 
     emergency_stop
         - Stop the ski lift in a case of an emergency.
-        
+
     abort <command_id>
         - Aborts a delayed command with the specified <command_id>.
 
@@ -35,10 +35,10 @@ Available commands:
 """
 
 WELCOME_TEXT: str = """
- __                      ___           _    
+ __                      ___           _
 / _\\_ __   _____      __/ _ \\___  __ _| | __
 \\ \\| '_ \\ / _ \\ \\ /\\ / / /_)/ _ \\/ _` | |/ /
-_\\ \\ | | | (_) \\ V  V / ___/  __/ (_| |   < 
+_\\ \\ | | | (_) \\ V  V / ___/  __/ (_| |   <
 \\__/_| |_|\\___/ \\_/\\_/\\/    \\___|\\__,_|_|\\_\\
 """
 
@@ -100,7 +100,7 @@ class CommandLineInterfaceView(BaseView):
 
     def process_emergency_stop_result(self, result: EmergencyStopResult) -> Any:
         self.handle_result(result, 'ENGINE STOPPED')
-    
+
     def handle_result(self, result: CommandResult, message_on_success: str):
         if result.outcome == CommandResult.OutCome.DELAYED:
             print(f'Type "abort {result.command.id}" to abort it.\n\n>', end='')
@@ -108,7 +108,7 @@ class CommandLineInterfaceView(BaseView):
             print(message_on_success)
         else:
             print(str(result.exception))
-        
+
     def display_suggestion(self, suggestion: Suggestion, reset_input=True) -> None:
         formatted_time = suggestion.time.strftime("%Y-%m-%d %H:%M:%S")
         print(f'\n[{formatted_time}] [{suggestion.category.name}]  {suggestion.message}{'\n\n>' if reset_input else '\n'}', end='')

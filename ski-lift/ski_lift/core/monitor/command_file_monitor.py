@@ -11,7 +11,7 @@ import os
 
 class CommandFileMonitor(CommandDescriptorMonitor, CommandResultMonitor):
     """Command file monitor.
-    
+
     Monitor command execution and results into a log file.
     """
 
@@ -21,7 +21,9 @@ class CommandFileMonitor(CommandDescriptorMonitor, CommandResultMonitor):
 
     @property
     def file_name(self) -> str:
-        return f'logs/commands-{self._init_time.strftime('%Y-%m-%d-%H:%M:%S')}.log'
+        log_dir = 'logs'
+        os.makedirs(log_dir, exist_ok=True)
+        return os.path.join(log_dir, f'commands-{self._init_time.strftime("%Y-%m-%d_%H-%M-%S")}.log')
 
     def process_descriptor_universally(self, command: CommandDescriptor) -> None:
         with open(self.file_name, 'a') as log_file:
