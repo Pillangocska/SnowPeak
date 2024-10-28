@@ -2,7 +2,7 @@ import hashlib
 from model.lift_state import LiftState
 
 class Lift:
-    SECRET_KEY = "pika.pika"
+    SECRET_KEY = "pika.pikazdsfgewuztr8to8rgif87732t8rgfge86f4g82g732gf8zg2eizfgozgfzewro8t326tr32tr"
 
     def __init__(self, start_lat, start_lon, start_elevation, end_lat, end_lon, end_elevation, num_seats):
         self.start_lat = start_lat
@@ -20,7 +20,7 @@ class Lift:
         data_to_hash = f"{location_string}{self.SECRET_KEY}"
         hash_object = hashlib.sha256(data_to_hash.encode())
         full_hash = hash_object.hexdigest()
-        return full_hash[:10]
+        return full_hash[:20]
 
     @property
     def state(self):
