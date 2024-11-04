@@ -23,6 +23,56 @@ services:
         reservations:
           memory: 256M
 
+  keycloak:
+    container_name: snow-peak-keycloak
+    image: quay.io/keycloak/keycloak:22.0.5
+    ports:
+      - 9090:8080
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_FEATURES: preview
+    volumes:
+      - ./keycloak/realms:/opt/keycloak/data/import
+    command:
+      - "start-dev"
+      - "--import-realm"
+    depends_on:
+      - keycloak-postgres
+    networks:
+      - keycloak-network
+
+  keycloak-postgres:
+    container_name: keycloak-postgres
+    image: postgres:15
+    ports:
+      - "5464:5432"
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - keycloak-network
+
+  volumes:
+    postgres_data:
+      driver: local
+
+  networks:
+    keycloak-network:
+      driver: bridge
+
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5454:5432'
+
 volumes:
   rabbitmq_data:
   rabbitmq_logs:

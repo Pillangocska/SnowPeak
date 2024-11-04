@@ -882,3 +882,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+!docker-compose.yml
+!keycloak/
+!keycloak/realms/
+!keycloak/realms/*.json
+!.gitignore
