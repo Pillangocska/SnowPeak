@@ -102,6 +102,11 @@
 			<artifactId>keycloak-spring-security-adapter</artifactId>
 			<version>22.0.5</version>
 		</dependency>
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-62</artifactId>
+			<version>3.7.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

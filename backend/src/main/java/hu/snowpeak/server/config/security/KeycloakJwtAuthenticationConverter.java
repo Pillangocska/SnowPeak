@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -30,11 +29,9 @@ public class KeycloakJwtAuthenticationConverter implements Converter<Jwt, Abstra
     }
 
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
-        var resourceAccess = new HashMap<>(jwt.getClaim("resource_access"));
+        var resourceAccess = new HashMap<>(jwt.getClaim("realm_access"));
 
-        var eternal = (Map<String, List<String>>) resourceAccess.get("account");
-
-        var roles = eternal.get("roles");
+        var roles = (List<String>) resourceAccess.get("roles");
 
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.replace("-", "_")))
