@@ -1,0 +1,5 @@
+@if (!keycloakService.isLoggedIn()) {
+  <button mat-raised-button (click)="login()">{{ "Belépés" }}</button>
+} @else {
+  <button mat-raised-button (click)="logout()">{{ "Kilépés" }}</button>
+}
