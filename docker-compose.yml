@@ -56,14 +56,6 @@ services:
     networks:
       - keycloak-network
 
-  volumes:
-    postgres_data:
-      driver: local
-
-  networks:
-    keycloak-network:
-      driver: bridge
-
   db:
     image: postgres:14.1-alpine
     restart: always
@@ -76,3 +68,9 @@ services:
 volumes:
   rabbitmq_data:
   rabbitmq_logs:
+  postgres_data:
+    driver: local
+
+networks:
+  keycloak-network:
+    driver: bridge
