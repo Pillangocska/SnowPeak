@@ -27,8 +27,8 @@ def main() -> int:
     cli = CommandLineInterfaceView(controller=controller)
 
     # test suggestion forwarder
-    suggestion_handler = TestSuggestionForwarder(view=cli)
-    remote_emergency_stopper = TestEmergencyStopper(view=cli)
+    # suggestion_handler = TestSuggestionForwarder(view=cli)
+    # remote_emergency_stopper = TestEmergencyStopper(view=cli)
 
     # start thread that handles delayed commands
     controller.start()
@@ -38,8 +38,8 @@ def main() -> int:
     #remote_emergency_stopper.start()
     cli.start_handling_user_inputs()
 
-    suggestion_handler.stop()
-    remote_emergency_stopper.stop()
+    # suggestion_handler.stop()
+    # remote_emergency_stopper.stop()
     controller.stop()
     return 0
 
