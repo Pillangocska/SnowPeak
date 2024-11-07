@@ -8,9 +8,11 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - rabbitmq_logs:/var/log/rabbitmq
+      - ./rabbitmq_enabled_plugins:/etc/rabbitmq/enabled_plugins
     ports:
       - "5672:5672"    # AMQP protocol port
       - "15672:15672"  # Management UI
+      - "15674:15674"  # WebSocket port
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-guest}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-guest}
