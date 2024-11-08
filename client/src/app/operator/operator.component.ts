@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { KeycloakService } from 'keycloak-angular';
 import { RxStompService } from '../rx-stomp.service';
+import { LogControllerService } from '../api/services';
 
 @Component({
   selector: 'app-operator',
@@ -13,6 +14,7 @@ import { RxStompService } from '../rx-stomp.service';
 export class OperatorComponent implements OnInit {
   keycloakService = inject(KeycloakService);
   rxStompService = inject(RxStompService);
+  logService = inject(LogControllerService);
 
   ngOnInit(): void {
     this.keycloakService.getToken().then((val) => console.log(val));
@@ -22,6 +24,8 @@ export class OperatorComponent implements OnInit {
       .subscribe((message) => {
         console.log('Received message:', message);
       });
+
+    this.logService.getLogs().subscribe((logs) => console.log(logs));
   }
 
   login(): void {
