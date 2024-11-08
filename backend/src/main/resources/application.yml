@@ -1,6 +1,10 @@
 server:
     port: 8080
 
+api:
+    version: v1
+    description: SnowPeak endpoints
+
 spring:
     application:
         name: snow-peak-server
@@ -38,3 +42,15 @@ keycloak:
     ssl-required: external
     public-client: true
     use-resource-role-mappings: true
+
+springdoc:
+    enable-native-support: true
+    default-produces-media-type: application/json
+    enable-data-rest: false
+    swagger-ui:
+        path: /swagger-ui.html
+        tags-sorter: alpha
+        operations-sorter: method
+        display-operation-id: true
+        use-root-path: true
+        filter: true

@@ -10,5 +10,5 @@ import org.mapstruct.ReportingPolicy;
 @Slf4j
 public abstract class LiftMapper {
 
-    public abstract LiftResponseModel fromEntityToDto(Lift product);
+    public abstract LiftResponseModel fromEntityToDto(Lift lift);
 }
