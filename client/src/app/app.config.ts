@@ -8,10 +8,15 @@ import { KeycloakBearerInterceptor, KeycloakService } from 'keycloak-angular';
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  provideHttpClient,
+  withInterceptors,
+} from '@angular/common/http';
 import { initializeKeycloak } from './keycloak-init.factory';
 import { RxStompService } from './rx-stomp.service';
 import { rxStompServiceFactory } from './rx-stomp-service-factory';
+import { authInterceptor } from './api/shared/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,6 +38,7 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
     KeycloakService,
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync('noop'),
   ],
 };
