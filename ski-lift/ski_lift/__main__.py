@@ -2,11 +2,11 @@ from ski_lift.app.entity.ski_lift_authorizer import SkiLiftAuthorizer
 from ski_lift.app.entity.ski_lift_controller import SkiLiftController
 from ski_lift.core.auth.authenticator.in_memory_authenticator import InMemoryAuthenticator
 from ski_lift.core.engine import Engine
-from ski_lift.core.monitor.command_file_monitor import CommandFileMonitor
-from ski_lift.core.remote.suggestion.test_remote_emergency_stopper import TestEmergencyStopper
-from ski_lift.core.remote.suggestion.test_suggestion_forwarder import TestSuggestionForwarder
+from ski_lift.core.monitor.logger.file import FileCommandLogger
 from ski_lift.core.view.cli_view import CommandLineInterfaceView
 import sys
+from ski_lift.core.command.descriptor.serializer.pretty_string import PrettyStringDescriptorSerializer
+from ski_lift.core.command.result.serializer.pretty_string import PrettyResultStringSerializer
 
 
 def main() -> int:
@@ -19,7 +19,10 @@ def main() -> int:
 
     # create a logger and register it as a descriptor (command request)
     # and result monitor
-    command_logger = CommandFileMonitor()
+    pretty_command = PrettyStringDescriptorSerializer()
+    pretty_result = PrettyResultStringSerializer()
+
+    command_logger = FileCommandLogger(pretty_command, pretty_result)
     controller.register_descriptor_monitor(command_logger)
     controller.register_result_monitor(command_logger)
 
