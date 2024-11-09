@@ -7,7 +7,7 @@ import json
 
 
 
-class JSONBytesDescriptorSerializer(PythonDictDescriptorSerializer)
+class JSONBytesDescriptorSerializer(PythonDictDescriptorSerializer):
     
     def __init__(self, convert_to_camel: bool = True) -> None:
         self._convert_to_camel: bool = convert_to_camel
