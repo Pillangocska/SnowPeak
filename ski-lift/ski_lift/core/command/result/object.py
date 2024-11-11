@@ -5,7 +5,7 @@ command results which are produced via command executors.
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Optional
 
@@ -14,6 +14,7 @@ from ski_lift.core.command.descriptor.object import (
     DisplayStatusCommandDescriptor, EmergencyStopDescriptor, InsertCardCommandDescriptor,
     RemoveCardCommandDescriptor)
 from ski_lift.core.engine import EngineState
+from datetime import datetime, timedelta
 
 if TYPE_CHECKING:
     from ski_lift.core.command.result.processor import ResultProcessor
@@ -52,9 +53,12 @@ class CommandResult(ABC):
         FAILED = auto()
 
     command: Optional[CommandDescriptor] = None
+    time: datetime = field(init=False)
     outcome: Optional[OutCome] = None
     exception: Optional[Exception] = None
 
+    def __post_init__(self):
+        self.time = self.command.time + timedelta(self.command.delay)
 
     @abstractmethod
     def accept(self, processor: 'ResultProcessor'):

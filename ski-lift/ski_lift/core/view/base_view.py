@@ -7,7 +7,7 @@ from ski_lift.core.command.descriptor.factory import CommandDescriptorFactory
 from ski_lift.core.command.descriptor.object import ChangeStateCommandDescriptor
 from ski_lift.core.controller import Controller
 from ski_lift.core.monitor.result.result_monitor import CommandResultMonitor
-from ski_lift.core.view.suggestion import Suggestion
+from ski_lift.core.remote.suggestion.suggestion import Suggestion
 
 
 class BaseView(CommandPanel, CommandResultMonitor):
