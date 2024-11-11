@@ -6,7 +6,7 @@ from ski_lift.core.command.descriptor.serializer.base import BaseDescriptorSeria
 from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from ski_lift.core.command.descriptor.object import CommandDescriptor
 from ski_lift.core.command.result.object import CommandResult
-from ski_lift.core.remote.rabbitmq.pika_client import PikaClient
+from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
 
 
 
@@ -17,23 +17,21 @@ class RabbitMQCommandLogger(BaseCommandLogger):
         self,
         descriptor_serializer: BaseDescriptorSerializer,
         result_serializer: BaseResultSerializer,
-        pika_client: PikaClient,
+        pika_producer: PikaProducer,
+        lift_id: str,
     ) -> None:
-        self.pika_client = pika_client
-        self.pika_client.declare_exchange(exchange='topic_logs', exchange_type='topic')
+        self._pika_producer: PikaProducer = pika_producer
+        self._lift_id: str = lift_id
         super().__init__(descriptor_serializer=descriptor_serializer, result_serializer=result_serializer)
 
 
     def process_descriptor_universally(self, command: CommandDescriptor) -> None:
-        self.pika_client.send_message(
-            exchange='topic_logs',
-            routing_key='skilift.logs.command',
-            body=self.serialize_command(command),
-        )
+        pass
 
     def process_result_universally(self, result: CommandResult) -> None:
-        self.pika_client.send_message(
-            exchange='topic_logs',
-            routing_key='skilift.logs.result',
-            body=self.serialize_result(result),
+        outcome: str = 'successful' if result.is_successful else 'failed'
+        self._pika_producer.publish_message(
+            routing_key=f'skilift.{self._lift_id}.logs.command.{outcome}',
+            message=self.serialize_result(result),
+            headers={'lift_id': self._lift_id}
         )

@@ -56,6 +56,7 @@ class SensorDataGenerator:
                                   Defaults to 5 seconds.
         """
         while True:
+            print('generating reading.')
             self.generate_single_reading()  # Generate one reading per sensor
             time.sleep(interval_seconds)    # Wait for the specified interval
 
