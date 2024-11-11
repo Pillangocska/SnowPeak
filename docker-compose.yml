@@ -20,22 +20,17 @@ services:
   backend:
     image: backend-v1
     container_name: backend
-    build: 
+    build:
       context: ./backend
       args:
         - SPRING_BOOT_PORT:${SPRING_BOOT_PORT}
-        - AMQP_PORT:${AMQP_PORT}
     restart: unless-stopped
     ports:
       - ${SPRING_BOOT_PORT}:${SPRING_BOOT_PORT}
-      - ${AMQP_PORT}:${AMQP_PORT}
     env_file:
       - .env
     depends_on:
       - db
-    expose:
-      - ${SPRING_BOOT_PORT}
-      - ${AMQP_PORT}
 
   rabbitmq:
     image: rabbitmq:3-management
