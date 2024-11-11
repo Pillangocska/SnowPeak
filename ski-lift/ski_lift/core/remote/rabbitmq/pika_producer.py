@@ -43,7 +43,6 @@ class PikaProducer(object):
         self._connection.channel(on_open_callback=self.on_channel_open)
 
     def on_connection_open_error(self, _unused_connection, err) -> None:
-        logger.error('Reconnecting in 5 ...')
         self._connection.ioloop.call_later(5, self._connection.ioloop.stop)
 
     def on_connection_closed(self, _unused_connection, reason) -> None:

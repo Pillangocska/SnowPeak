@@ -101,7 +101,6 @@ class ExampleConsumer(object):
         :param Exception err: The error
 
         """
-        LOGGER.error('Connection open failed: %s', err)
         self.reconnect()
 
     def on_connection_closed(self, _unused_connection, reason):
