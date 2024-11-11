@@ -4,7 +4,7 @@ from typing import Any
 from ski_lift.core.command.descriptor.object import ChangeStateCommandDescriptor
 from ski_lift.core.command.result.object import AbortCommandResult, ChangeStateCommandResult, CommandResult, DisplayStatusCommandResult, EmergencyStopResult, InsertCardCommandResult, RemoveCardCommandResult
 from ski_lift.core.view.base_view import BaseView
-from ski_lift.core.view.suggestion import Suggestion
+from ski_lift.core.remote.suggestion.suggestion import Suggestion
 from tests.entity import command
 
 

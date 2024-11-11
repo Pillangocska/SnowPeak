@@ -8,6 +8,7 @@ from ski_lift.core.monitor.result.result_monitor import CommandResultMonitor
 from ski_lift.core.command.descriptor.serializer.base import BaseDescriptorSerializer
 from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from typing import Any
+from ski_lift.core.controller import Controller
 
 
 class BaseCommandLogger(CommandDescriptorMonitor, CommandResultMonitor):
@@ -20,7 +21,10 @@ class BaseCommandLogger(CommandDescriptorMonitor, CommandResultMonitor):
         self._descriptor_serializer = descriptor_serializer
         self._result_serializer = result_serializer
 
-    
+    def attach_to(self, controller: Controller) -> None:
+        controller.register_descriptor_monitor(self)
+        controller.register_result_monitor(self)
+
     def serialize_command(self, command: CommandDescriptor) -> Any:
         return self._descriptor_serializer.serialize(command)
     
