@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  ski-lift-1:
+    image: krisztianszenasi/ski-lift:latest
+    stdin_open: true
+    tty: true
+    environment:
+      LIFT_ID: lift1
+      RABBITMQ_HOST: rabbitmq
+  ski-lift-2:
+    image: krisztianszenasi/ski-lift:latest
+    stdin_open: true
+    tty: true
+    environment:
+      LIFT_ID: lift2
+      RABBITMQ_HOST: rabbitmq
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
