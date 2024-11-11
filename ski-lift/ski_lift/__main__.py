@@ -54,7 +54,7 @@ def create_pika_producer() -> PikaProducer:
 def main() -> int:
     if len(sys.argv) < 2:
         print('Usage: python -m ski_lift <lift_id>')
-        return
+        return 1
     lift_id: str = sys.argv[1]
 
     # create an example authenticator and register a card number
