@@ -54,10 +54,13 @@ def create_pika_producer() -> PikaProducer:
 
 def main() -> int:
     print(f'version: {__version__.__version__}')
-    if len(sys.argv) < 2:
-        print('Usage: python -m ski_lift <lift_id>')
-        return 1
-    lift_id: str = sys.argv[1]
+    lift_id: str = os.environ.get('LIFT_ID')
+    try:
+        lift_id = sys.argv[1]
+    except IndexError:
+        if lift_id is None:
+            print('Usage: python -m ski_lift <lift_id>')
+            return 1
 
     # create an example authenticator and register a card number
     authenticator = InMemoryAuthenticator()
