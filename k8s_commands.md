@@ -12,3 +12,5 @@ kubectl exec -it <pod-name> -- /bin/bash
 kubectl delete -f <filename>.yaml
 # see dashboard:
 minikube dashboard
+# stop minikube
+minikube stop
