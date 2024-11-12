@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  frontend:
+    build:
+      context: ./client
+      args:
+        - ANGULAR_PORT:${ANGULAR_PORT}
+    restart: unless-stopped
+    ports:
+      - ${ANGULAR_PORT}:${ANGULAR_PORT}
+    depends_on:
+      - backend
+
   ski-lift-1:
     image: krisztianszenasi/ski-lift:latest
     stdin_open: true
