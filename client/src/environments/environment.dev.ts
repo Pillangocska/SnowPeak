@@ -3,6 +3,6 @@ export const environment = {
   keycloak: {
     realm: 'snow-peak',
     clientId: 'snow-peak',
-    url: 'http://localhost:9090',
+    url: 'http://localhost:9090', // keyclaok:9090
   },
 };
