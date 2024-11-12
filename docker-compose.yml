@@ -6,7 +6,7 @@ services:
     stdin_open: true
     tty: true
     environment:
-      LIFT_ID: lift1
+      LIFT_ID: ${LIFT_1_ID}
       RABBITMQ_HOST: rabbitmq
 
   ski-lift-2:
@@ -14,7 +14,15 @@ services:
     stdin_open: true
     tty: true
     environment:
-      LIFT_ID: lift2
+      LIFT_ID: ${LIFT_2_ID}
+      RABBITMQ_HOST: rabbitmq
+
+  ski-lift-3:
+    image: krisztianszenasi/ski-lift:latest
+    stdin_open: true
+    tty: true
+    environment:
+      LIFT_ID: ${LIFT_3_ID}
       RABBITMQ_HOST: rabbitmq
 
   backend:
