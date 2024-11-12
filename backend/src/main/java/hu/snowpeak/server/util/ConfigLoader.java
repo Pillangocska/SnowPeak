@@ -1,6 +1,6 @@
 package hu.snowpeak.server.util;
 
-import hu.snowpeak.server.service.ConfigFileService;
+/*import hu.snowpeak.server.service.ConfigFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,4 +23,4 @@ public class ConfigLoader implements CommandLineRunner {
         configFileService.processConfigDirectory(configDirectoryPath);
         log.info("Completed loading configurations");
     }
-}
+}*/
