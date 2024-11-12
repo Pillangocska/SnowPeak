@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -15,10 +17,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class Lift extends AbstractBaseEntity {
-
-    @Column(name = "lift_ext_id")
-    private UUID extId;
 
     @Column(name = "lift_start_latitude")
     private Float startLatitude;
@@ -43,4 +43,13 @@ public class Lift extends AbstractBaseEntity {
 
     @Column(name = "lift_num_seats")
     private Integer numberOfSeats;
+
+    @Column(name = "lift_master_operator_id")
+    private UUID masterOperatorId;
+
+    @ElementCollection
+    @CollectionTable(name = "worker",
+            joinColumns = {@JoinColumn(name = "worker_lift_id", referencedColumnName = "lift_id", nullable = false)})
+    @Column(name = "worker_id")
+    private Set<UUID> workers;
 }
