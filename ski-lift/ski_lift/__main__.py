@@ -17,7 +17,7 @@ import os
 from ski_lift.core.sensor.sensor_data_generator import SensorDataGenerator
 from ski_lift.core.sensor.observer.rabbitmq_observer import RabbitMQObserver
 from threading import Thread
-from ski_lift import __version__
+from ski_lift.core.utils import get_lift_id_or_exit
 
 
 def setup_sensor(lift_id: str, pika_producer: PikaProducer) -> None:
@@ -53,14 +53,7 @@ def create_pika_producer() -> PikaProducer:
 
 
 def main() -> int:
-    print(f'version: {__version__.__version__}')
-    lift_id: str = os.environ.get('LIFT_ID')
-    try:
-        lift_id = sys.argv[1]
-    except IndexError:
-        if lift_id is None:
-            print('Usage: python -m ski_lift <lift_id>')
-            return 1
+    lift_id: str = get_lift_id_or_exit()
 
     # create an example authenticator and register a card number
     authenticator = InMemoryAuthenticator()
