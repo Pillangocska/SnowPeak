@@ -24,6 +24,7 @@ def get_lift_id_or_exit() -> str:
         if lift_id is None:
             print('Usage: python -m ski_lift <lift_id>')
             exit(1)
+    return lift_id
 
 
 def datetime_parser(data):

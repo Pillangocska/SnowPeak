@@ -75,7 +75,7 @@ def main() -> int:
     )
     rabbit_logger.attach_to(controller)
 
-    cli = CommandLineInterfaceView(controller=controller)
+    cli = CommandLineInterfaceView(lift_id=lift_id, controller=controller)
 
     controller.start()
     cli.start_handling_user_inputs()

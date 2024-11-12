@@ -6,6 +6,8 @@ from ski_lift.core.command.result.object import AbortCommandResult, ChangeStateC
 from ski_lift.core.view.base_view import BaseView
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
 from tests.entity import command
+from string import Template
+from ski_lift import __version__
 
 
 DEFAULT_HELP_TEXT: str = """
@@ -34,12 +36,15 @@ Available commands:
         - Displays this help message listing all available commands.
 """
 
-WELCOME_TEXT: str = """
+WELCOME_TEXT_TEMPLATE: str = """
  __                      ___           _
 / _\\_ __   _____      __/ _ \\___  __ _| | __
 \\ \\| '_ \\ / _ \\ \\ /\\ / / /_)/ _ \\/ _` | |/ /
 _\\ \\ | | | (_) \\ V  V / ___/  __/ (_| |   <
 \\__/_| |_|\\___/ \\_/\\_/\\/    \\___|\\__,_|_|\\_\\
+
+version: $version
+lift id: $lift_id$current_user
 """
 
 class CommandLineInterfaceView(BaseView):
@@ -50,8 +55,17 @@ class CommandLineInterfaceView(BaseView):
     class UnsupportedChangeStateOption(Exception):
         pass
 
+    @property
+    def welcome_text(self) -> str:
+        return Template(WELCOME_TEXT_TEMPLATE).substitute(
+            version=__version__.__version__,
+            lift_id=self._lift_id,
+            current_user=f'\nuser: {self.inserted_card}' if self.inserted_card else '',
+        )
+
+
     def start_handling_user_inputs(self) -> None:
-        print(WELCOME_TEXT)
+        print(self.welcome_text)
         while True:
             user_input = input('\n> ').lower().split()
             command_name = user_input[0]
