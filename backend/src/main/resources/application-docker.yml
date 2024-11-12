@@ -36,13 +36,12 @@ security:
   oauth2:
     resourceserver:
       jwt:
-        issuer-uri: http://keycloak:8080/realms/snow-peak
-        jwk-set-uri: http://keycloak:8080/realms/snow-peak/protocol/openid-connect/certs
+        issuer-uri: http://keycloak:9090/realms/snow-peak
 
 keycloak:
   realm: snow-peak
   resource: snow-peak
-  auth-server-url: http://keycloak:8080/auth
+  auth-server-url: http://keycloak:9090/auth
   ssl-required: external
   public-client: true
   use-resource-role-mappings: true
