@@ -120,6 +120,8 @@ spec:
           value: "lift1"
         - name: RABBITMQ_HOST
           value: "rabbitmq"
+        - name: RABBITMQ_PORT
+          value: "5672"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -143,3 +145,5 @@ spec:
           value: "lift2"
         - name: RABBITMQ_HOST
           value: "rabbitmq"
+        - name: RABBITMQ_PORT
+          value: "5672"

@@ -10,3 +10,5 @@ kubectl logs <pod-name>
 kubectl exec -it <pod-name> -- /bin/bash
 # delete resources
 kubectl delete -f <filename>.yaml
+# see dashboard:
+minikube dashboard
