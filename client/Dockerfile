@@ -1,31 +1,45 @@
-# Stage 1: Build the Angular application
-FROM node:20-alpine as builder
+# Stage 1: Build
+FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application
+# Copy rest of the application
 COPY . .
 
 # Build the application
 RUN npm run build
 
-# Stage 2: Serve the application
+# Add debug ls to see what's in the output directory
+RUN ls -la /app/dist/snow-peak-client/browser
+
+# Stage 2: Run
 FROM nginx:1.25-alpine
 
-COPY nginx.conf /data/conf/nginx.conf
+# Remove default nginx configuration
+RUN rm -rf /etc/nginx/conf.d/default.conf
+RUN rm -rf /etc/nginx/nginx.conf
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copy the built application from builder stage
-COPY --from=builder /app/dist/snow-peak-client /usr/share/nginx/html
+# Copy custom configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port 80
+# Create directory for your app
+RUN mkdir -p /usr/share/nginx/html
+
+# Copy built assets
+COPY --from=builder /app/dist/snow-peak-client/browser/ /usr/share/nginx/html/
+
+# Debug: List contents of nginx html directory
+RUN ls -la /usr/share/nginx/html
+
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-c", "/data/conf/nginx.conf", "-g", "daemon off;"]
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD wget -q --no-cache --spider http://localhost/health || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]
