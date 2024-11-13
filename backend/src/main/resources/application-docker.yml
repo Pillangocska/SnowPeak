@@ -41,6 +41,24 @@ spring:
         jwt:
           issuer-uri: http://keycloak:9090/realms/snow-peak
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 5000
+    template:
+      retry:
+        enabled: true
+        initial-interval: 2000
+        max-attempts: 5
+        max-interval: 10000
+        multiplier: 1.5
+
+rabbitmq:
+  exchange:
+    name: exchange-name
+
 keycloak:
   realm: snow-peak
   resource: snow-peak

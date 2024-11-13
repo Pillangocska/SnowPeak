@@ -41,12 +41,19 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
     env_file:
       - .env
     depends_on:
-      - db
-      - rabbitmq
-      - keycloak
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_started
+      keycloak:
+        condition: service_started
     networks:
       - frontend-network
       - backend-network
@@ -110,6 +117,11 @@ services:
       - backend-network
     labels:
       kompose.service.type: ClusterIP
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     deploy:
       resources:
         limits:
