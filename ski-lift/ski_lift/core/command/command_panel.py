@@ -1,8 +1,8 @@
 """Command panel."""
 
+from multiprocessing import Value
 from ski_lift.core.command.descriptor.factory import CommandDescriptorFactory
-from ski_lift.core.command.descriptor.object import \
-    ChangeStateCommandDescriptor
+from ski_lift.core.command.descriptor.object import ChangeStateCommandDescriptor, MessageReportCommandDescriptor
 from ski_lift.core.controller import Controller
 
 
@@ -70,3 +70,20 @@ class CommandPanel:
                 user_card=self.inserted_card
             )
         )
+
+    def message_report(self, severity: str, message: str) -> None:
+        self._controller.execute(
+            CommandDescriptorFactory.create_message_report(
+                user_card=self.inserted_card,
+                severity=self._parse_severity(severity),
+                message=message,
+            )
+        )
+
+    def _parse_severity(self, severity: str) -> MessageReportCommandDescriptor.Severity:
+        try:
+            return MessageReportCommandDescriptor.Severity(severity.upper())
+        except ValueError as exc:
+            raise ValueError(
+                f'Could not recognize severity level "{severity}".\nOptions are INFO, WARNING or DANGER',
+            ) from exc

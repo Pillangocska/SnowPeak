@@ -6,7 +6,7 @@ from typing import Optional
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor,
     DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
-    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
+    InsertCardCommandDescriptor, MessageReportCommandDescriptor, RemoveCardCommandDescriptor)
 
 
 class CommandDescriptorFactory:
@@ -85,4 +85,22 @@ class CommandDescriptorFactory:
             user_card=user_card,
             time=time or datetime.now(),
             delay=delay,
+        )
+
+    @classmethod
+    def create_message_report(
+        cls,
+        *,
+        user_card: str,
+        time: Optional[datetime] = None,
+        delay: int = 0,
+        severity: MessageReportCommandDescriptor.Severity,
+        message: str,
+    ) -> MessageReportCommandDescriptor:
+        return MessageReportCommandDescriptor(
+            user_card=user_card,
+            time=time or datetime.now(),
+            delay=delay,
+            severity=severity,
+            message=message
         )

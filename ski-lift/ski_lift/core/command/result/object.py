@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Optional
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
     DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
-    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
+    InsertCardCommandDescriptor, MessageReportCommandDescriptor, RemoveCardCommandDescriptor)
 from ski_lift.core.engine import EngineState
 
 if TYPE_CHECKING:
@@ -128,3 +128,13 @@ class EmergencyStopCommandResult(CommandResult):
 
     def accept(self, processor: 'ResultProcessor'):
         return processor.process_emergency_stop_result(self)
+
+
+@dataclass(kw_only=True)
+class MessageReportCommandResult(CommandResult):
+    """Command result for the message report command."""
+
+    command: Optional[MessageReportCommandDescriptor] = None
+
+    def accept(self, processor: 'ResultProcessor'):
+        return processor.process_message_report_result(self)

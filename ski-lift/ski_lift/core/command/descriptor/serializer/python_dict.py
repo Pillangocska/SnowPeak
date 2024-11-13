@@ -1,5 +1,7 @@
 """Command descriptor json serializer."""
 
+from typing import Any
+from ..object import MessageReportCommandDescriptor
 from ski_lift.core.command.descriptor.object import (
     ChangeStateCommandDescriptor, CommandDescriptor,
     InsertCardCommandDescriptor)
@@ -28,4 +30,9 @@ class PythonDictDescriptorSerializer(BaseDescriptorSerializer):
     def process_change_state_descriptor(self, command: ChangeStateCommandDescriptor) -> dict:
         command_dict: dict =  super().process_change_state_descriptor(command)
         command_dict.update({'args': {'new_state': command.new_state.name}})
+        return command_dict
+    
+    def process_message_report_descriptor(self, command: MessageReportCommandDescriptor) -> Any:
+        command_dict: dict =  super().process_change_state_descriptor(command)
+        command_dict.update({'args': {'severity': command.severity.name, 'message': command.message}})
         return command_dict

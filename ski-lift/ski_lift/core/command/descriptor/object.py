@@ -129,3 +129,20 @@ class EmergencyStopCommandDescriptor(CommandDescriptor):
 
     def accept(self, processor: 'DescriptorProcessor'):
         return processor.process_emergency_stop_descriptor(self)
+    
+
+@dataclass(kw_only=True)
+class MessageReportCommandDescriptor(CommandDescriptor):
+    """Command descriptor for reporting messages to the central room."""
+
+    class Severity(Enum):
+
+        INFO = 'INFO'
+        WARNING = 'WARNING'
+        DANGER = 'DANGER'
+
+    severity: Severity
+    message: str
+
+    def accept(self, processor: 'DescriptorProcessor'):
+        return processor.process_message_report_descriptor(self)

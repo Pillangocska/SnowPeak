@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from ..object import MessageReportCommandDescriptor
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
     DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
@@ -14,7 +15,7 @@ from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  CommandResult,
                                                  DisplayStatusCommandResult,
                                                  EmergencyStopCommandResult,
-                                                 InsertCardCommandResult,
+                                                 InsertCardCommandResult, MessageReportCommandResult,
                                                  RemoveCardCommandResult)
 
 
@@ -67,3 +68,6 @@ class CommandExecutor(DescriptorProcessor):
     
     def process_emergency_stop_descriptor(self, command: EmergencyStopCommandDescriptor) -> EmergencyStopCommandResult:
         return super().process_emergency_stop_descriptor(command)
+    
+    def process_message_report_descriptor(self, command: MessageReportCommandDescriptor) -> MessageReportCommandResult:
+        return super().process_message_report_descriptor(command)

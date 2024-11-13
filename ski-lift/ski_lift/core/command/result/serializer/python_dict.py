@@ -1,5 +1,7 @@
 """Command result python dict serializer."""
 
+from typing import Any
+from ..object import MessageReportCommandResult
 from ski_lift.core.command.result.object import CommandResult
 from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from ski_lift.core.utils import class_name_to_snake
@@ -33,4 +35,12 @@ class PythonDictResultSerializer(BaseResultSerializer):
     def process_abort_command_result(self, result: AbortCommandResult) -> dict:
         result_dict: dict = super().process_abort_command_result(result)
         result_dict['args'] = {'command_to_abort': result.command.command_to_abort}
+        return result_dict
+
+    def process_message_report_result(self, result: MessageReportCommandResult) -> Any:
+        result_dict: dict = super().process_abort_command_result(result)
+        result_dict['args'] = {
+            'severity': result.command.severity.name,
+            'message': result.command.message,
+        }
         return result_dict

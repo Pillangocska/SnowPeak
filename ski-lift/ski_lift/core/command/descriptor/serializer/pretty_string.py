@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from string import Template
 from typing import Any, Optional
 
+from ..object import MessageReportCommandDescriptor
 from ski_lift.core.command.descriptor.object import (
     ChangeStateCommandDescriptor, CommandDescriptor,
     InsertCardCommandDescriptor)
@@ -73,5 +74,17 @@ class PrettyStringDescriptorSerializer(BaseDescriptorSerializer):
         pretty_text += self._arg_template.substitute(
             arg_name='new_state',
             arg_value=command.new_state.name
+        )
+        return pretty_text
+
+    def process_message_report_descriptor(self, command: MessageReportCommandDescriptor) -> Any:
+        pretty_text: str = super().process_message_report_descriptor(command)
+        pretty_text += self._arg_template.substitute(
+            arg_name='severity',
+            arg_value=command.severity.name,
+        )
+        pretty_text += self._arg_template.substitute(
+            arg_name='message',
+            arg_value=command.message,
         )
         return pretty_text

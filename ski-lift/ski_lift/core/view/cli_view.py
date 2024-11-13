@@ -3,6 +3,7 @@
 from string import Template
 from typing import Any
 
+from ..command.result.object import MessageReportCommandResult
 from ski_lift import __version__
 from ski_lift.core.command.descriptor.object import \
     ChangeStateCommandDescriptor
@@ -16,6 +17,7 @@ from ski_lift.core.command.result.object import (AbortCommandResult,
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
 from ski_lift.core.view.base_view import BaseView
 from tests.entity import command
+
 
 DEFAULT_HELP_TEXT: str = """
 Available commands:
@@ -38,6 +40,10 @@ Available commands:
 
     abort <command_id>
         - Aborts a delayed command with the specified <command_id>.
+
+    report <severity> <message>
+        - Send a report to the central room.
+        - Possible severities are INFO, WARNING and DANGER.
 
     help
         - Displays this help message listing all available commands.
@@ -91,6 +97,7 @@ class CommandLineInterfaceView(BaseView):
                     case 'change_state': self.change_state(self.parse_to_engine_option(*args))
                     case 'display_status': self.display_status()
                     case 'emergency_stop': self.emergency_stop()
+                    case 'report': self.message_report(*args)
                     case 'abort': self.abort_command(*args)
                     case 'help': print(DEFAULT_HELP_TEXT)
                     case 'exit': break
@@ -99,8 +106,9 @@ class CommandLineInterfaceView(BaseView):
                 print(
                     f'Did not recognize "{command_name}" command. Type "help" to display the available commands.'
                 )
-            except Exception as exc:
-                print(str(exc))
+            except TypeError as type_exc:
+                print(f'Incorrect arguments for command "{command_name}". Type "help" to display correct usage.')
+                
 
     def parse_to_engine_option(self, option_str: str) -> ChangeStateCommandDescriptor.Option:
         match(option_str):
@@ -127,6 +135,9 @@ class CommandLineInterfaceView(BaseView):
 
     def process_emergency_stop_result(self, result: EmergencyStopCommandResult) -> Any:
         self.handle_result(result, 'ENGINE STOPPED')
+
+    def process_message_report_result(self, result: MessageReportCommandResult) -> Any:
+        self.handle_result(result, 'REPORT SENT')
 
     def handle_result(self, result: CommandResult, message_on_success: str):
         if result.outcome == CommandResult.OutCome.DELAYED:

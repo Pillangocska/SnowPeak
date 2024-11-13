@@ -6,7 +6,7 @@ from typing import Any
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
     DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
-    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
+    InsertCardCommandDescriptor, MessageReportCommandDescriptor, RemoveCardCommandDescriptor)
 
 
 class DescriptorProcessor(ABC):
@@ -42,4 +42,7 @@ class DescriptorProcessor(ABC):
         return self.process_descriptor_universally(command)
 
     def process_emergency_stop_descriptor(self, command: EmergencyStopCommandDescriptor) -> Any:
+        return self.process_descriptor_universally(command)
+    
+    def process_message_report_descriptor(self, command: MessageReportCommandDescriptor) -> Any:
         return self.process_descriptor_universally(command)

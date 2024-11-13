@@ -1,5 +1,7 @@
 """Controller implementation."""
 
+from ...core.command.descriptor.object import MessageReportCommandDescriptor
+from ...core.command.result.object import MessageReportCommandResult
 from ski_lift.core.auth.authorizer.base_authorizer import (BaseAuthorizer,
                                                            send_through_auth)
 from ski_lift.core.command.descriptor.object import (
@@ -69,3 +71,9 @@ class SkiLiftController(Controller):
     def process_emergency_stop_descriptor(self, command: EmergencyStopCommandDescriptor) -> EmergencyStopCommandResult:
         self._engine.stop()
         return super().process_emergency_stop_descriptor(command)
+    @send_through_auth
+    def process_message_report_descriptor(self, command: MessageReportCommandDescriptor) -> MessageReportCommandResult:
+        print('Simulating sending report:')
+        print(f'severity: {command.severity.name}')
+        print(f'message: {command.message}')
+        return super().process_message_report_descriptor(command)
