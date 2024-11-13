@@ -1,9 +1,10 @@
 """Command descriptor serializer."""
 
 
-from ski_lift.core.command.descriptor.processor import DescriptorProcessor
-from ski_lift.core.command.descriptor.object import CommandDescriptor
 from typing import Any
+
+from ski_lift.core.command.descriptor.object import CommandDescriptor
+from ski_lift.core.command.descriptor.processor import DescriptorProcessor
 
 
 class BaseDescriptorSerializer(DescriptorProcessor):

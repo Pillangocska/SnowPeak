@@ -1,9 +1,10 @@
 """Command result descriptor serializer."""
 
 
-from ski_lift.core.command.result.processor import ResultProcessor
-from ski_lift.core.command.result.object import CommandResult
 from typing import Any
+
+from ski_lift.core.command.result.object import CommandResult
+from ski_lift.core.command.result.processor import ResultProcessor
 
 
 class BaseResultSerializer(ResultProcessor):

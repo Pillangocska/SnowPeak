@@ -1,8 +1,11 @@
-from scipy.signal import savgol_filter
 from datetime import datetime, timedelta
 from typing import List, Tuple
+
 import numpy as np
+from scipy.signal import savgol_filter
+
 from ski_lift.core.sensor.factory.base_sensor import BaseSensor
+
 
 class WindSensor(BaseSensor):
     """Wind sensor implementation.

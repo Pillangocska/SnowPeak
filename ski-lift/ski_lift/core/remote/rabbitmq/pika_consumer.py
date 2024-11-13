@@ -2,14 +2,13 @@
 
 import functools
 import logging
-from threading import Thread, Event
 import time
-import pika
-from pika.exchange_type import ExchangeType
-from pika.connection import ConnectionParameters
+from threading import Event, Thread
 from typing import Callable
 
-
+import pika
+from pika.connection import ConnectionParameters
+from pika.exchange_type import ExchangeType
 
 LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
               '-35s %(lineno) -5d: %(message)s')

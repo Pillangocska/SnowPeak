@@ -6,15 +6,15 @@ command results which are produced via command executors.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Optional
 
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
-    DisplayStatusCommandDescriptor, EmergencyStopDescriptor, InsertCardCommandDescriptor,
-    RemoveCardCommandDescriptor)
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
+    InsertCardCommandDescriptor, MessageReportCommandDescriptor, RemoveCardCommandDescriptor)
 from ski_lift.core.engine import EngineState
-from datetime import datetime, timedelta
 
 if TYPE_CHECKING:
     from ski_lift.core.command.result.processor import ResultProcessor
@@ -121,10 +121,20 @@ class AbortCommandResult(CommandResult):
 
 
 @dataclass
-class EmergencyStopResult(CommandResult):
+class EmergencyStopCommandResult(CommandResult):
     """Command result for the emergency stop command."""
     
-    command: Optional[EmergencyStopDescriptor] = None
+    command: Optional[EmergencyStopCommandDescriptor] = None
 
     def accept(self, processor: 'ResultProcessor'):
         return processor.process_emergency_stop_result(self)
+
+
+@dataclass(kw_only=True)
+class MessageReportCommandResult(CommandResult):
+    """Command result for the message report command."""
+
+    command: Optional[MessageReportCommandDescriptor] = None
+
+    def accept(self, processor: 'ResultProcessor'):
+        return processor.process_message_report_result(self)

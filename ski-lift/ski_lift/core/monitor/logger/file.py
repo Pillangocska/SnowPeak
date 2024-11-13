@@ -1,14 +1,15 @@
 """Command file monitor."""
 
 
-from ski_lift.core.monitor.logger.base import BaseCommandLogger
-from datetime import datetime
-from ski_lift.core.command.descriptor.serializer.base import BaseDescriptorSerializer
-from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 import os
-from ski_lift.core.command.descriptor.object import CommandDescriptor
-from ski_lift.core.command.result.object import CommandResult
+from datetime import datetime
 
+from ski_lift.core.command.descriptor.object import CommandDescriptor
+from ski_lift.core.command.descriptor.serializer.base import \
+    BaseDescriptorSerializer
+from ski_lift.core.command.result.object import CommandResult
+from ski_lift.core.command.result.serializer.base import BaseResultSerializer
+from ski_lift.core.monitor.logger.base import BaseCommandLogger
 
 
 class FileCommandLogger(BaseCommandLogger):

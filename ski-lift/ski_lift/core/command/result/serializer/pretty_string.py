@@ -2,11 +2,11 @@
 
 
 from dataclasses import dataclass
+from string import Template
 from typing import Optional
 
-from ski_lift.core.command.result.serializer.base import BaseResultSerializer
-from string import Template
 from ski_lift.core.command.result.object import CommandResult
+from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from ski_lift.core.utils import class_name_to_snake
 
 

@@ -1,6 +1,6 @@
-from ski_lift.core.sensor.sensor_data_generator import SensorDataGenerator
-from ski_lift.core.sensor.observer.rabbitmq_observer import RabbitMQObserver
 from ski_lift.core.sensor.observer.print_observer import PrintObserver
+from ski_lift.core.sensor.observer.rabbitmq_observer import RabbitMQObserver
+from ski_lift.core.sensor.sensor_data_generator import SensorDataGenerator
 
 sensor_config = {
         'base_temperature': {'mean_temp': -5, 'amplitude': 3},

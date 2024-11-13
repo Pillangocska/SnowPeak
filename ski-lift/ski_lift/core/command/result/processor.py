@@ -6,8 +6,9 @@ from typing import Any
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
-                                                 DisplayStatusCommandResult, EmergencyStopResult,
-                                                 InsertCardCommandResult,
+                                                 DisplayStatusCommandResult,
+                                                 EmergencyStopCommandResult,
+                                                 InsertCardCommandResult, MessageReportCommandResult,
                                                  RemoveCardCommandResult)
 
 
@@ -44,5 +45,8 @@ class ResultProcessor(ABC):
     def process_abort_command_result(self, result: AbortCommandResult) -> Any:
         return self.process_result_universally(result)
 
-    def process_emergency_stop_result(self, result: EmergencyStopResult) -> Any:
+    def process_emergency_stop_result(self, result: EmergencyStopCommandResult) -> Any:
+        return self.process_result_universally(result)
+    
+    def process_message_report_result(self, result: MessageReportCommandResult) -> Any:
         return self.process_result_universally(result)

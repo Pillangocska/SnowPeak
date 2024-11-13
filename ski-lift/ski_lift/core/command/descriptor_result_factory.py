@@ -2,16 +2,18 @@
 
 from typing import Any, Optional
 
+from .descriptor.object import MessageReportCommandDescriptor
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
-    DisplayStatusCommandDescriptor, EmergencyStopDescriptor, InsertCardCommandDescriptor,
-    RemoveCardCommandDescriptor)
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
+    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
 from ski_lift.core.command.descriptor.processor import DescriptorProcessor
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
-                                                 DisplayStatusCommandResult, EmergencyStopResult,
-                                                 InsertCardCommandResult,
+                                                 DisplayStatusCommandResult,
+                                                 EmergencyStopCommandResult,
+                                                 InsertCardCommandResult, MessageReportCommandResult,
                                                  RemoveCardCommandResult)
 
 
@@ -51,5 +53,8 @@ class DescriptorResultFactory(DescriptorProcessor):
     def process_abort_command_descriptor(self, descriptor: AbortCommandDescriptor) -> AbortCommandResult:
         return AbortCommandResult(command=descriptor)
 
-    def process_emergency_stop_descriptor(self, descriptor: EmergencyStopDescriptor) -> EmergencyStopResult:
-        return EmergencyStopResult(command=descriptor)
+    def process_emergency_stop_descriptor(self, descriptor: EmergencyStopCommandDescriptor) -> EmergencyStopCommandResult:
+        return EmergencyStopCommandResult(command=descriptor)
+
+    def process_message_report_descriptor(self, descriptor: MessageReportCommandDescriptor) -> Any:
+        return MessageReportCommandResult(command=descriptor)

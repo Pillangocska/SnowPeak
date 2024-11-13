@@ -28,6 +28,14 @@ class DelayedCommandExecutor(CommandExecutor):
         self._executor_thread = Thread(target=self._process_delayed_commands, daemon=True)
         super().__init__(*args, **kwargs)
 
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.stop()
+        return False
+
     def start(self):
         """Start the execution thread.
         

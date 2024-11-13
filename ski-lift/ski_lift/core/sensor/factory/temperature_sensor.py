@@ -1,7 +1,10 @@
-import numpy as np
 from datetime import datetime, timedelta
 from typing import List, Tuple
+
+import numpy as np
+
 from ski_lift.core.sensor.factory.base_sensor import BaseSensor
+
 
 class TemperatureSensor(BaseSensor):
     """Temperature sensor implementation.

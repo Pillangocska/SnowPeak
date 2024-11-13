@@ -1,8 +1,7 @@
 """Controller implementation."""
 
-
-from ski_lift.core.auth.authorizer.base_authorizer import (BaseAuthorizer,
-                                                           CommandAuthorizable)
+import re
+from ski_lift.core.auth import CommandAuthorizable, BaseAuthorizer
 from ski_lift.core.command.descriptor.executor.delayed import \
     DelayedCommandExecutor
 from ski_lift.core.engine import Engine
@@ -10,6 +9,7 @@ from ski_lift.core.monitor.descriptor.descriptor_monitor import (
     CommandDescriptorMonitor, CommandDescriptorMonitorSource)
 from ski_lift.core.monitor.result.result_monitor import (
     CommandResultMonitor, CommandResultMonitorSource)
+from ski_lift.core.remote.communicator import RemoteCommunicator
 
 
 class Controller(
@@ -32,9 +32,15 @@ class Controller(
     Check the super classes for more information.
     """
 
-    def __init__(self, engine: Engine, authorizer: BaseAuthorizer):
+    def __init__(self, lift_id: str, engine: Engine, authorizer: BaseAuthorizer, remote_communicator: RemoteCommunicator):
+        self._lift_id = lift_id
         self._engine = engine
+        self._remote_communicator = remote_communicator
         super().__init__(authorizer=authorizer)
+
+    @property
+    def lift_id(self) -> str:
+        return self._lift_id
 
     @property
     def inserted_card(self) -> int:

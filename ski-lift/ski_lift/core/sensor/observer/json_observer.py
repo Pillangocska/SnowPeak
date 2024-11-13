@@ -1,6 +1,8 @@
 import json
-from ski_lift.core.sensor.observer.sensor_observer import SensorObserver
+
 from ski_lift.core.sensor.factory.base_sensor import SensorReading
+from ski_lift.core.sensor.observer.sensor_observer import SensorObserver
+
 
 class JsonFileObserver(SensorObserver):
     """Saves sensor readings to a JSON file."""

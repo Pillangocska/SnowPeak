@@ -1,15 +1,18 @@
 """Controller implementation."""
 
+from ...core.command.descriptor.object import MessageReportCommandDescriptor
+from ...core.command.result.object import MessageReportCommandResult
 from ski_lift.core.auth.authorizer.base_authorizer import (BaseAuthorizer,
                                                            send_through_auth)
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
-    DisplayStatusCommandDescriptor, EmergencyStopDescriptor, InsertCardCommandDescriptor,
-    RemoveCardCommandDescriptor)
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
+    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
-                                                 DisplayStatusCommandResult, EmergencyStopResult,
+                                                 DisplayStatusCommandResult,
+                                                 EmergencyStopCommandResult,
                                                  InsertCardCommandResult,
                                                  RemoveCardCommandResult)
 from ski_lift.core.controller import Controller
@@ -17,12 +20,9 @@ from ski_lift.core.engine import Engine
 from ski_lift.core.monitor.descriptor.descriptor_monitor import \
     monitor_descriptor
 from ski_lift.core.monitor.result.result_monitor import monitor_result
-
+from  ski_lift.core.remote.communicator import RemoteCommunicator
 
 class SkiLiftController(Controller):
-
-    def __init__(self, engine: Engine, authorizer: BaseAuthorizer):
-        super().__init__(engine=engine, authorizer=authorizer)
 
     def handle_delayed(self, command: CommandDescriptor):
         self.authenticate_delayed(command)
@@ -65,6 +65,12 @@ class SkiLiftController(Controller):
         self.abort(command.command_to_abort)
         return super().process_abort_command_descriptor(command)
     
-    def process_emergency_stop_descriptor(self, command: EmergencyStopDescriptor) -> EmergencyStopResult:
+    def process_emergency_stop_descriptor(self, command: EmergencyStopCommandDescriptor) -> EmergencyStopCommandResult:
         self._engine.stop()
         return super().process_emergency_stop_descriptor(command)
+    @send_through_auth
+    def process_message_report_descriptor(self, command: MessageReportCommandDescriptor) -> MessageReportCommandResult:
+        result: MessageReportCommandResult = super().process_message_report_descriptor(command)
+        self._remote_communicator.send_message_report(command)
+        return result
+

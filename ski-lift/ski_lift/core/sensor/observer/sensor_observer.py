@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+
 from ski_lift.core.sensor.factory.base_sensor import SensorReading
+
 
 # This is our base Observer interface
 class SensorObserver(ABC):

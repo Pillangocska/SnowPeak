@@ -1,12 +1,14 @@
 """Command file monitor."""
 
 
+import os
+from datetime import datetime
+
 from ski_lift.core.command.descriptor.object import CommandDescriptor
 from ski_lift.core.command.result.object import CommandResult
-from ski_lift.core.monitor.descriptor.descriptor_monitor import CommandDescriptorMonitor
+from ski_lift.core.monitor.descriptor.descriptor_monitor import \
+    CommandDescriptorMonitor
 from ski_lift.core.monitor.result.result_monitor import CommandResultMonitor
-from datetime import datetime
-import os
 
 
 class CommandFileMonitor(CommandDescriptorMonitor, CommandResultMonitor):

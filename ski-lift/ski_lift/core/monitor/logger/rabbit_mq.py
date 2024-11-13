@@ -1,13 +1,13 @@
 """RabbitMQ command logger."""
 
 
-from ski_lift.core.monitor.logger.base import BaseCommandLogger
-from ski_lift.core.command.descriptor.serializer.base import BaseDescriptorSerializer
-from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from ski_lift.core.command.descriptor.object import CommandDescriptor
+from ski_lift.core.command.descriptor.serializer.base import \
+    BaseDescriptorSerializer
 from ski_lift.core.command.result.object import CommandResult
+from ski_lift.core.command.result.serializer.base import BaseResultSerializer
+from ski_lift.core.monitor.logger.base import BaseCommandLogger
 from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
-
 
 
 class RabbitMQCommandLogger(BaseCommandLogger):

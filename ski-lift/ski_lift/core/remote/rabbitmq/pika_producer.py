@@ -1,13 +1,13 @@
-from typing import Any
-import pika
-from pika.exchange_type import ExchangeType
-from time import sleep
-from pika.connection import ConnectionParameters
-from pika.channel import Channel
-from pika.adapters import SelectConnection
-from threading import Thread, Event
-from typing import Optional, List, Tuple
 import logging
+from threading import Event, Thread
+from time import sleep
+from typing import Any, List, Optional, Tuple
+
+import pika
+from pika.adapters import SelectConnection
+from pika.channel import Channel
+from pika.connection import ConnectionParameters
+from pika.exchange_type import ExchangeType
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,14 @@ class PikaProducer(object):
         self._connection: SelectConnection  = None
         self._channel: Channel = None
         self._pending_messages: List[Tuple] = []
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exec_type, exc_value, traceback) -> bool:
+        self.stop()
+        return False
 
     def connect(self) -> SelectConnection:
         return pika.SelectConnection(

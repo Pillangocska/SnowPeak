@@ -1,14 +1,15 @@
 """Base view."""
 
 from abc import abstractmethod
+from typing import Optional
 
 from ski_lift.core.command.command_panel import CommandPanel
 from ski_lift.core.command.descriptor.factory import CommandDescriptorFactory
-from ski_lift.core.command.descriptor.object import ChangeStateCommandDescriptor
+from ski_lift.core.command.descriptor.object import \
+    ChangeStateCommandDescriptor
 from ski_lift.core.controller import Controller
 from ski_lift.core.monitor.result.result_monitor import CommandResultMonitor
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
-from typing import Optional
 
 
 class BaseView(CommandPanel, CommandResultMonitor):
@@ -25,14 +26,17 @@ class BaseView(CommandPanel, CommandResultMonitor):
     them to receive results and provide appropriate feedback to the user.
     """ 
 
-    def __init__(self, lift_id: str, controller: Controller, *args, **kwargs) -> None:
-        self._lift_id = lift_id
+    def __init__(self, controller: Controller, *args, **kwargs) -> None:
         controller.register_result_monitor(self)
         super().__init__(controller=controller, *args, **kwargs)
 
     @property
     def inserted_card(self) -> Optional[str]:
         return self._controller.inserted_card
+    
+    @property
+    def lift_id(self) -> str:
+        return self._controller.lift_id
 
     @abstractmethod
     def start_handling_user_inputs(self) -> None:
