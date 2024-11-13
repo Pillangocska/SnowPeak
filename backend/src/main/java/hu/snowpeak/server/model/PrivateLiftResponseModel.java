@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class LiftResponseModel {
+public class PrivateLiftResponseModel {
     private UUID id;
     private Float startLatitude;
     private Float startLongitude;
@@ -13,4 +13,6 @@ public class LiftResponseModel {
     private Float endLatitude;
     private Float endLongitude;
     private Float endElevation;
+    private Integer seatCapacity;
+    private Integer numberOfSeats;
 }
