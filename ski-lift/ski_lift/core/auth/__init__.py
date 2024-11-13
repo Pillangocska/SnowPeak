@@ -1,3 +1,3 @@
 from .authenticator import (BaseAuthenticator, InMemoryAuthenticator,
                             RabbitMQAuth)
-from .authorizer import BaseAuthorizer
+from .authorizer import BaseAuthorizer, CommandAuthorizable

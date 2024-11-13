@@ -1,6 +1,5 @@
 """Command panel."""
 
-from multiprocessing import Value
 from ski_lift.core.command.descriptor.factory import CommandDescriptorFactory
 from ski_lift.core.command.descriptor.object import ChangeStateCommandDescriptor, MessageReportCommandDescriptor
 from ski_lift.core.controller import Controller

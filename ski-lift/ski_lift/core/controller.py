@@ -1,8 +1,6 @@
 """Controller implementation."""
 
-
-from ski_lift.core.auth.authorizer.base_authorizer import (BaseAuthorizer,
-                                                           CommandAuthorizable)
+from ski_lift.core.auth import CommandAuthorizable, BaseAuthorizer
 from ski_lift.core.command.descriptor.executor.delayed import \
     DelayedCommandExecutor
 from ski_lift.core.engine import Engine

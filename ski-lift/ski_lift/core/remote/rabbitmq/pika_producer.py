@@ -30,6 +30,14 @@ class PikaProducer(object):
         self._channel: Channel = None
         self._pending_messages: List[Tuple] = []
 
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, exec_type, exc_value, traceback) -> bool:
+        self.stop()
+        return False
+
     def connect(self) -> SelectConnection:
         return pika.SelectConnection(
             self._connection_parameters,
