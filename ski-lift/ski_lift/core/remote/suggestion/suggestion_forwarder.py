@@ -11,16 +11,19 @@ class SuggestionForwarder:
     
     def __init__(self, view: BaseView):
         self._view = view
-        self._stop_event = Event()
-        self._executor_thread = Thread(target=self.handle_suggestions, daemon=True)
+
+    def __enter__(self):
+        self.start_handling_suggestions()
+        return self
+    
+    def __exit__(self, exc_type, exc_value, stack_trace) -> bool:
+        self.stop_handling_suggestions()
+        return False
 
     @abstractmethod
-    def handle_suggestions(self) -> None:
+    def start_handling_suggestions(self) -> None:
         pass
-
-    def start(self):
-        self._executor_thread.start()
-
-    def stop(self):
-        self._stop_event.set()
-        self._executor_thread.join()
+    
+    @abstractmethod
+    def stop_handling_suggestions(self):
+        pass
