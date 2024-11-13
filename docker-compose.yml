@@ -43,6 +43,8 @@ services:
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
     env_file:
       - .env
+    volumes:
+      - ./config:/app/config
     depends_on:
       - db
       - rabbitmq

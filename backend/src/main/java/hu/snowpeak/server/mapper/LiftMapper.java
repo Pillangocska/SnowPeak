@@ -3,6 +3,7 @@ package hu.snowpeak.server.mapper;
 import hu.snowpeak.server.entity.Lift;
 import hu.snowpeak.server.model.LiftConfigModel;
 import hu.snowpeak.server.model.LiftResponseModel;
+import hu.snowpeak.server.model.PrivateLiftResponseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,6 +14,8 @@ import org.mapstruct.ReportingPolicy;
 public abstract class LiftMapper {
 
     public abstract LiftResponseModel fromEntityToDto(Lift lift);
+
+    public abstract PrivateLiftResponseModel fromEntityToPrivateDto(Lift lift);
 
     @Mapping(target = "id", source = "liftId")
     @Mapping(target = "startLatitude", source = "startLat")
