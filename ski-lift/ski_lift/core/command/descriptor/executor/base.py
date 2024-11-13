@@ -3,7 +3,7 @@
 from typing import Any
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
-    DisplayStatusCommandDescriptor, EmergencyStopDescriptor, InsertCardCommandDescriptor,
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor, InsertCardCommandDescriptor,
     RemoveCardCommandDescriptor)
 from ski_lift.core.command.descriptor.processor import DescriptorProcessor
 from ski_lift.core.command.descriptor_result_factory import \
@@ -11,7 +11,7 @@ from ski_lift.core.command.descriptor_result_factory import \
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
-                                                 DisplayStatusCommandResult,
+                                                 DisplayStatusCommandResult, EmergencyStopCommandResult,
                                                  InsertCardCommandResult,
                                                  RemoveCardCommandResult)
 
@@ -63,5 +63,5 @@ class CommandExecutor(DescriptorProcessor):
     def process_abort_command_descriptor(self, command: AbortCommandDescriptor) -> AbortCommandResult:
         return super().process_abort_command_descriptor(command)
     
-    def process_emergency_stop_descriptor(self, command: EmergencyStopDescriptor) -> EmergencyStopDescriptor:
+    def process_emergency_stop_descriptor(self, command: EmergencyStopCommandDescriptor) -> EmergencyStopCommandResult:
         return super().process_emergency_stop_descriptor(command)

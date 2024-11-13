@@ -124,7 +124,7 @@ class AbortCommandDescriptor(CommandDescriptor):
     
 
 @dataclass
-class EmergencyStopDescriptor(CommandDescriptor):
+class EmergencyStopCommandDescriptor(CommandDescriptor):
     """Command descriptor for emergency stop."""
 
     def accept(self, processor: 'DescriptorProcessor'):

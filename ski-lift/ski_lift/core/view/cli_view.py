@@ -2,7 +2,7 @@
 
 from typing import Any
 from ski_lift.core.command.descriptor.object import ChangeStateCommandDescriptor
-from ski_lift.core.command.result.object import AbortCommandResult, ChangeStateCommandResult, CommandResult, DisplayStatusCommandResult, EmergencyStopResult, InsertCardCommandResult, RemoveCardCommandResult
+from ski_lift.core.command.result.object import AbortCommandResult, ChangeStateCommandResult, CommandResult, DisplayStatusCommandResult, EmergencyStopCommandResult, InsertCardCommandResult, RemoveCardCommandResult
 from ski_lift.core.view.base_view import BaseView
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
 from tests.entity import command
@@ -118,7 +118,7 @@ class CommandLineInterfaceView(BaseView):
     def process_abort_command_result(self, result: AbortCommandResult) -> Any:
         self.handle_result(result, f'COMMAND {result.command.command_to_abort} ABORTED')
 
-    def process_emergency_stop_result(self, result: EmergencyStopResult) -> Any:
+    def process_emergency_stop_result(self, result: EmergencyStopCommandResult) -> Any:
         self.handle_result(result, 'ENGINE STOPPED')
 
     def handle_result(self, result: CommandResult, message_on_success: str):

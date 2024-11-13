@@ -4,12 +4,12 @@ from ski_lift.core.auth.authorizer.base_authorizer import (BaseAuthorizer,
                                                            send_through_auth)
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
-    DisplayStatusCommandDescriptor, EmergencyStopDescriptor, InsertCardCommandDescriptor,
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor, InsertCardCommandDescriptor,
     RemoveCardCommandDescriptor)
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
-                                                 DisplayStatusCommandResult, EmergencyStopResult,
+                                                 DisplayStatusCommandResult, EmergencyStopCommandResult,
                                                  InsertCardCommandResult,
                                                  RemoveCardCommandResult)
 from ski_lift.core.controller import Controller
@@ -65,6 +65,6 @@ class SkiLiftController(Controller):
         self.abort(command.command_to_abort)
         return super().process_abort_command_descriptor(command)
     
-    def process_emergency_stop_descriptor(self, command: EmergencyStopDescriptor) -> EmergencyStopResult:
+    def process_emergency_stop_descriptor(self, command: EmergencyStopCommandDescriptor) -> EmergencyStopCommandResult:
         self._engine.stop()
         return super().process_emergency_stop_descriptor(command)

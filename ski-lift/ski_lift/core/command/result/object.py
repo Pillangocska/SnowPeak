@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Optional
 
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
-    DisplayStatusCommandDescriptor, EmergencyStopDescriptor, InsertCardCommandDescriptor,
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor, InsertCardCommandDescriptor,
     RemoveCardCommandDescriptor)
 from ski_lift.core.engine import EngineState
 from datetime import datetime, timedelta
@@ -121,10 +121,10 @@ class AbortCommandResult(CommandResult):
 
 
 @dataclass
-class EmergencyStopResult(CommandResult):
+class EmergencyStopCommandResult(CommandResult):
     """Command result for the emergency stop command."""
     
-    command: Optional[EmergencyStopDescriptor] = None
+    command: Optional[EmergencyStopCommandDescriptor] = None
 
     def accept(self, processor: 'ResultProcessor'):
         return processor.process_emergency_stop_result(self)
