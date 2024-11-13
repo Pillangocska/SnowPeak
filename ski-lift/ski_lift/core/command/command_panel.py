@@ -40,11 +40,12 @@ class CommandPanel:
             )
         )
 
-    def change_state(self, new_state: ChangeStateCommandDescriptor.Option) -> None:
+    def change_state(self, new_state: str, delay: int = 0) -> None:
         self._controller.execute(
             CommandDescriptorFactory.create_change_state(
                 user_card=self.inserted_card,
-                new_state=new_state,
+                new_state=self._parse_new_state(new_state),
+                delay=int(delay),
             )
         )
 
@@ -78,6 +79,14 @@ class CommandPanel:
                 message=message,
             )
         )
+
+    def _parse_new_state(self, new_state: str) -> ChangeStateCommandDescriptor.Option:
+        try:
+            return ChangeStateCommandDescriptor.Option(new_state.upper())
+        except ValueError as exc:
+            raise ValueError(
+                f'Could not recognize state "{new_state}".\nOptions are MAX_STEAM, FULL_STEAM, HALF_STEAM or STOP',
+            ) from exc
 
     def _parse_severity(self, severity: str) -> MessageReportCommandDescriptor.Severity:
         try:

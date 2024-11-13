@@ -90,10 +90,10 @@ class ChangeStateCommandDescriptor(CommandDescriptor):
         These options correspond to the ones defined in the Engine class.
         """
 
-        MAX_STEAM = auto()
-        FULL_STEAM = auto()
-        HALF_STEAM = auto()
-        STOP = auto()
+        MAX_STEAM = 'MAX_STEAM'
+        FULL_STEAM = 'FULL_STEAM'
+        HALF_STEAM = 'HALF_STEAM'
+        STOP = 'STOP'
 
     new_state: Option
 
