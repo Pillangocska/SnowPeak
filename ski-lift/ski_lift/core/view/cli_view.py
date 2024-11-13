@@ -65,6 +65,12 @@ class CommandLineInterfaceView(BaseView):
 
 
     def start_handling_user_inputs(self) -> None:
+        try:
+            self.start_handling_cli_input()
+        except KeyboardInterrupt:
+            print('Exiting...')
+
+    def start_handling_cli_input(self) -> None:
         print(self.welcome_text)
         while True:
             user_input = input('\n> ').lower().split()
