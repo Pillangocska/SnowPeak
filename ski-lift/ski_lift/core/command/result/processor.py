@@ -6,7 +6,8 @@ from typing import Any
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
-                                                 DisplayStatusCommandResult, EmergencyStopCommandResult,
+                                                 DisplayStatusCommandResult,
+                                                 EmergencyStopCommandResult,
                                                  InsertCardCommandResult,
                                                  RemoveCardCommandResult)
 

@@ -1,12 +1,11 @@
 """Command result python dict serializer."""
 
-from ..object import AbortCommandResult
-
-from ..object import ChangeStateCommandResult
-from ..object import InsertCardCommandResult
 from ski_lift.core.command.result.object import CommandResult
 from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from ski_lift.core.utils import class_name_to_snake
+
+from ..object import (AbortCommandResult, ChangeStateCommandResult,
+                      InsertCardCommandResult)
 
 
 class PythonDictResultSerializer(BaseResultSerializer):

@@ -1,9 +1,9 @@
 """Suggestion forwarder."""
 
 from abc import abstractmethod
-from ski_lift.core.controller import Controller
 from threading import Event, Thread
 
+from ski_lift.core.controller import Controller
 from ski_lift.core.view.base_view import BaseView
 
 

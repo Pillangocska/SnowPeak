@@ -4,13 +4,14 @@ from typing import Any, Optional
 
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
-    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor, InsertCardCommandDescriptor,
-    RemoveCardCommandDescriptor)
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
+    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
 from ski_lift.core.command.descriptor.processor import DescriptorProcessor
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
-                                                 DisplayStatusCommandResult, EmergencyStopCommandResult,
+                                                 DisplayStatusCommandResult,
+                                                 EmergencyStopCommandResult,
                                                  InsertCardCommandResult,
                                                  RemoveCardCommandResult)
 

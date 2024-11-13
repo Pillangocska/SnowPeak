@@ -1,7 +1,10 @@
 """Command descriptor json serializer."""
 
-from ski_lift.core.command.descriptor.object import CommandDescriptor, InsertCardCommandDescriptor, ChangeStateCommandDescriptor
-from ski_lift.core.command.descriptor.serializer.base import BaseDescriptorSerializer
+from ski_lift.core.command.descriptor.object import (
+    ChangeStateCommandDescriptor, CommandDescriptor,
+    InsertCardCommandDescriptor)
+from ski_lift.core.command.descriptor.serializer.base import \
+    BaseDescriptorSerializer
 from ski_lift.core.utils import class_name_to_snake
 
 

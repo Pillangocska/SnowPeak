@@ -1,10 +1,12 @@
 """Command descriptor json serializer."""
 
-from ski_lift.core.command.descriptor.object import CommandDescriptor
-from ski_lift.core.command.descriptor.serializer.python_dict import PythonDictDescriptorSerializer
-from camel_converter import dict_to_camel
 import json
 
+from camel_converter import dict_to_camel
+
+from ski_lift.core.command.descriptor.object import CommandDescriptor
+from ski_lift.core.command.descriptor.serializer.python_dict import \
+    PythonDictDescriptorSerializer
 
 
 class JSONBytesDescriptorSerializer(PythonDictDescriptorSerializer):

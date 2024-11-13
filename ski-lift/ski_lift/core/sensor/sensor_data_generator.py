@@ -1,7 +1,9 @@
-from datetime import datetime, timedelta
 import time
-from typing import Dict, List, Any
+from datetime import datetime, timedelta
+from typing import Any, Dict, List
+
 from ski_lift.core.sensor.factory.sensor_factory import SensorFactory
+
 
 class SensorDataGenerator:
     """Main class for generating synchronized sensor data.

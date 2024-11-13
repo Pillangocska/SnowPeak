@@ -1,9 +1,11 @@
 """RabbitMQ suggestion forwarder."""
 
-from ski_lift.core.remote.suggestion.suggestion_forwarder import SuggestionForwarder
 import pika
-from ski_lift.core.view.base_view import BaseView
+
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
+from ski_lift.core.remote.suggestion.suggestion_forwarder import \
+    SuggestionForwarder
+from ski_lift.core.view.base_view import BaseView
 
 
 class RabbitMQSuggestionForwarder(SuggestionForwarder):

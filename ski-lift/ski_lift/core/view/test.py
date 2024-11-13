@@ -1,12 +1,14 @@
-from textual.app import App, ComposeResult
-from textual.containers import Vertical, Horizontal, Container, ScrollableContainer
-from textual.widgets import Header, Footer, Input, RichLog, Static, Button
-from textual.screen import ModalScreen
-from textual.binding import Binding
-from queue import Queue
 import asyncio
 import random
 from datetime import datetime
+from queue import Queue
+
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import (Container, Horizontal, ScrollableContainer,
+                                Vertical)
+from textual.screen import ModalScreen
+from textual.widgets import Button, Footer, Header, Input, RichLog, Static
 
 DEFAULT_HELP_TEXT: str = """
     insert_card <card_id>

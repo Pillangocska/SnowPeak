@@ -1,7 +1,9 @@
-import os
-import pika
 import json
+import os
 import time
+
+import pika
+
 
 class RabbitMQClient:
     def __init__(self):

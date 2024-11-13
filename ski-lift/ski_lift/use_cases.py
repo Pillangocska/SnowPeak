@@ -1,10 +1,10 @@
 """Ski lift use cases."""
 
 import os
-
 from typing import List
+
+from ski_lift.app.entity import SkiLiftAuthorizer, SkiLiftController
 from ski_lift.core.auth import BaseAuthenticator, InMemoryAuthenticator
-from ski_lift.app.entity import SkiLiftController, SkiLiftAuthorizer
 from ski_lift.core.controller import Controller
 from ski_lift.core.engine import Engine
 

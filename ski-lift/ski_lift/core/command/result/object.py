@@ -6,15 +6,15 @@ command results which are produced via command executors.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Optional
 
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
-    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor, InsertCardCommandDescriptor,
-    RemoveCardCommandDescriptor)
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
+    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
 from ski_lift.core.engine import EngineState
-from datetime import datetime, timedelta
 
 if TYPE_CHECKING:
     from ski_lift.core.command.result.processor import ResultProcessor

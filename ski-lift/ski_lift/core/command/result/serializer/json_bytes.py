@@ -1,10 +1,12 @@
 """Command result json serializer."""
 
-from ski_lift.core.command.result.object import CommandResult
-from ski_lift.core.command.result.serializer.python_dict import PythonDictResultSerializer
-from camel_converter import dict_to_camel
 import json
 
+from camel_converter import dict_to_camel
+
+from ski_lift.core.command.result.object import CommandResult
+from ski_lift.core.command.result.serializer.python_dict import \
+    PythonDictResultSerializer
 
 
 class JSONBytesResultSerializer(PythonDictResultSerializer):

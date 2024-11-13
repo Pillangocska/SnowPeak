@@ -7,7 +7,8 @@ from ski_lift.core.auth.authorizer.base_authorizer import BaseAuthorizer
 from ski_lift.core.command.descriptor.object import (
     CommandDescriptor, InsertCardCommandDescriptor,
     RemoveCardCommandDescriptor)
-from ski_lift.core.command.descriptor_result_factory import DescriptorResultFactory
+from ski_lift.core.command.descriptor_result_factory import \
+    DescriptorResultFactory
 from ski_lift.core.command.result.object import (CommandResult,
                                                  InsertCardCommandResult)
 

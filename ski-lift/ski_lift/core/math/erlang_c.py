@@ -1,6 +1,7 @@
 import math
 from typing import Dict
 
+
 class ErlangCModel:
     def __init__(self, arrival_rate, line_speed, carrier_capacity,
                  carrier_spacing, carriers_loading,

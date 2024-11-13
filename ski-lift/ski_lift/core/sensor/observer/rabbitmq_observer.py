@@ -1,7 +1,9 @@
-from ski_lift.core.sensor.observer.sensor_observer import SensorObserver
-from ski_lift.core.sensor.factory.base_sensor import SensorReading
-from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
 import json
+
+from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
+from ski_lift.core.sensor.factory.base_sensor import SensorReading
+from ski_lift.core.sensor.observer.sensor_observer import SensorObserver
+
 
 class RabbitMQObserver(SensorObserver):
     """Sends sensor readings to RabbitMQ."""

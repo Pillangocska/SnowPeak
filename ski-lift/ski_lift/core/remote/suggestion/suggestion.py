@@ -1,11 +1,14 @@
 """Suggestion representation."""
 
 import datetime
-from enum import Enum, auto
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
+from enum import Enum, auto
+
 from camel_converter import dict_to_snake
+
 from ski_lift.core.utils import datetime_parser
+
 
 class SuggestionCategory(Enum):
 

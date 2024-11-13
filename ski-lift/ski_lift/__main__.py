@@ -1,19 +1,25 @@
+import os
+import sys
+from threading import Thread
+
+import pika
+
+from ski_lift.core.command.descriptor.serializer.json_bytes import \
+    JSONBytesDescriptorSerializer
+from ski_lift.core.command.descriptor.serializer.pretty_string import \
+    PrettyStringDescriptorSerializer
+from ski_lift.core.command.result.serializer.json_bytes import \
+    JSONBytesResultSerializer
+from ski_lift.core.command.result.serializer.pretty_string import \
+    PrettyResultStringSerializer
+from ski_lift.core.controller import Controller
 from ski_lift.core.monitor.logger.file import FileCommandLogger
 from ski_lift.core.monitor.logger.rabbit_mq import RabbitMQCommandLogger
-from ski_lift.core.view.cli_view import CommandLineInterfaceView
-import sys
-from ski_lift.core.command.descriptor.serializer.pretty_string import PrettyStringDescriptorSerializer
-from ski_lift.core.command.descriptor.serializer.json_bytes import JSONBytesDescriptorSerializer
-from ski_lift.core.command.result.serializer.pretty_string import PrettyResultStringSerializer
-from ski_lift.core.command.result.serializer.json_bytes import JSONBytesResultSerializer
 from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
-import pika
-import os
-from ski_lift.core.sensor.sensor_data_generator import SensorDataGenerator
 from ski_lift.core.sensor.observer.rabbitmq_observer import RabbitMQObserver
-from threading import Thread
+from ski_lift.core.sensor.sensor_data_generator import SensorDataGenerator
 from ski_lift.core.utils import get_lift_id_or_exit
-from ski_lift.core.controller import Controller
+from ski_lift.core.view.cli_view import CommandLineInterfaceView
 from ski_lift.use_cases import create_controller
 
 

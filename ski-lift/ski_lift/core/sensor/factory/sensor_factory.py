@@ -1,6 +1,8 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 from ski_lift.core.sensor.factory.temperature_sensor import TemperatureSensor
 from ski_lift.core.sensor.factory.wind_sensor import WindSensor
+
 
 class SensorFactory:
     """Factory class for creating sensor instances.

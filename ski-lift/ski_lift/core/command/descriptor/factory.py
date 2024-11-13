@@ -1,8 +1,12 @@
 """Command descriptor factory."""
 
-from ski_lift.core.command.descriptor.object import AbortCommandDescriptor, ChangeStateCommandDescriptor, DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor, InsertCardCommandDescriptor, RemoveCardCommandDescriptor
 from datetime import datetime
 from typing import Optional
+
+from ski_lift.core.command.descriptor.object import (
+    AbortCommandDescriptor, ChangeStateCommandDescriptor,
+    DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
+    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
 
 
 class CommandDescriptorFactory:

@@ -2,11 +2,14 @@
 
 
 from dataclasses import dataclass
+from string import Template
 from typing import Any, Optional
 
-from ski_lift.core.command.descriptor.serializer.base import BaseDescriptorSerializer
-from ski_lift.core.command.descriptor.object import CommandDescriptor, InsertCardCommandDescriptor, ChangeStateCommandDescriptor
-from string import Template
+from ski_lift.core.command.descriptor.object import (
+    ChangeStateCommandDescriptor, CommandDescriptor,
+    InsertCardCommandDescriptor)
+from ski_lift.core.command.descriptor.serializer.base import \
+    BaseDescriptorSerializer
 from ski_lift.core.utils import class_name_to_snake
 
 
