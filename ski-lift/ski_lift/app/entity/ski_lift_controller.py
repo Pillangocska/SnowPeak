@@ -20,12 +20,9 @@ from ski_lift.core.engine import Engine
 from ski_lift.core.monitor.descriptor.descriptor_monitor import \
     monitor_descriptor
 from ski_lift.core.monitor.result.result_monitor import monitor_result
-
+from  ski_lift.core.remote.communicator import RemoteCommunicator
 
 class SkiLiftController(Controller):
-
-    def __init__(self, engine: Engine, authorizer: BaseAuthorizer):
-        super().__init__(engine=engine, authorizer=authorizer)
 
     def handle_delayed(self, command: CommandDescriptor):
         self.authenticate_delayed(command)
@@ -73,7 +70,7 @@ class SkiLiftController(Controller):
         return super().process_emergency_stop_descriptor(command)
     @send_through_auth
     def process_message_report_descriptor(self, command: MessageReportCommandDescriptor) -> MessageReportCommandResult:
-        print('Simulating sending report:')
-        print(f'severity: {command.severity.name}')
-        print(f'message: {command.message}')
-        return super().process_message_report_descriptor(command)
+        result: MessageReportCommandResult = super().process_message_report_descriptor(command)
+        self._remote_communicator.send_message_report(command)
+        return result
+

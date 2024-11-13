@@ -26,14 +26,17 @@ class BaseView(CommandPanel, CommandResultMonitor):
     them to receive results and provide appropriate feedback to the user.
     """ 
 
-    def __init__(self, lift_id: str, controller: Controller, *args, **kwargs) -> None:
-        self._lift_id = lift_id
+    def __init__(self, controller: Controller, *args, **kwargs) -> None:
         controller.register_result_monitor(self)
         super().__init__(controller=controller, *args, **kwargs)
 
     @property
     def inserted_card(self) -> Optional[str]:
         return self._controller.inserted_card
+    
+    @property
+    def lift_id(self) -> str:
+        return self._controller.lift_id
 
     @abstractmethod
     def start_handling_user_inputs(self) -> None:

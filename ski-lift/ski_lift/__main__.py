@@ -7,13 +7,13 @@ from ski_lift.core.view.cli_view import CommandLineInterfaceView
 from ski_lift.use_cases import create_controller, create_pika_producer, setup_sensor, attach_loggers_to
 
 
-def main() -> int:
-    lift_id: str = get_lift_id_or_exit()
-    with create_controller() as controller:
-        with create_pika_producer() as producer:
-            attach_loggers_to(controller, lift_id, producer)            
-            setup_sensor(lift_id=lift_id, pika_producer=producer)
-            cli = CommandLineInterfaceView(lift_id=lift_id, controller=controller)
+def main() -> int:        
+    with create_pika_producer() as producer:
+        with create_controller(lift_id=get_lift_id_or_exit(), producer=producer) as controller:
+            attach_loggers_to(controller, producer)            
+            # todo: refactor to be inside controller
+            setup_sensor(lift_id=get_lift_id_or_exit(), pika_producer=producer)
+            cli = CommandLineInterfaceView(controller=controller)
             cli.start_handling_user_inputs()
             return 0
 

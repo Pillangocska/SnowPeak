@@ -72,7 +72,7 @@ class CommandLineInterfaceView(BaseView):
     def welcome_text(self) -> str:
         return Template(WELCOME_TEXT_TEMPLATE).substitute(
             version=__version__.__version__,
-            lift_id=self._lift_id,
+            lift_id=self.lift_id,
             current_user=f'\nuser: {self.inserted_card}' if self.inserted_card else '',
         )
 

@@ -14,11 +14,12 @@ from threading import Thread
 from ski_lift.core.monitor.logger import FileCommandLogger, RabbitMQCommandLogger
 from ski_lift.core.command.descriptor.serializer import PrettyStringDescriptorSerializer, JSONBytesDescriptorSerializer
 from ski_lift.core.command.result.serializer import PrettyResultStringSerializer, JSONBytesResultSerializer
+from ski_lift.core.remote.communicator.rabbit_mq import RabbitMQCommunicator
 
 
-def attach_loggers_to(controller: Controller, lift_id: str, producer: PikaProducer):
+def attach_loggers_to(controller: Controller, producer: PikaProducer):
     attach_file_logger_to(controller)
-    attach_rabbit_mq_logger_to(controller, lift_id, producer)
+    attach_rabbit_mq_logger_to(controller, controller.lift_id, producer)
 
 
 def attach_file_logger_to(controller: Controller):
@@ -36,11 +37,13 @@ def attach_rabbit_mq_logger_to(controller: Controller, lift_id: str, producer: P
 
 
 
-def create_controller() -> Controller:
+def create_controller(lift_id: str, producer: PikaProducer) -> Controller:
     """Create a controller with an authorizer."""
     return SkiLiftController(
+        lift_id=lift_id,
         engine=Engine(),
         authorizer=SkiLiftAuthorizer(authenticator=create_authenticate_from_env()),
+        remote_communicator=RabbitMQCommunicator(lift_id=lift_id, producer=producer)
     )
 
 
