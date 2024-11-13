@@ -2,7 +2,7 @@
 
 from ski_lift.core.command.descriptor.object import CommandDescriptor, InsertCardCommandDescriptor, ChangeStateCommandDescriptor
 from ski_lift.core.command.descriptor.serializer.base import BaseDescriptorSerializer
-from ski_lift.core.utils.string_utils import class_name_to_snake
+from ski_lift.core.utils import class_name_to_snake
 
 
 class PythonDictDescriptorSerializer(BaseDescriptorSerializer):

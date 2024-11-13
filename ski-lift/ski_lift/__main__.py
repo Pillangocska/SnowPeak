@@ -1,7 +1,3 @@
-from ski_lift.app.entity.ski_lift_authorizer import SkiLiftAuthorizer
-from ski_lift.app.entity.ski_lift_controller import SkiLiftController
-from ski_lift.core.auth.authenticator.in_memory_authenticator import InMemoryAuthenticator
-from ski_lift.core.engine import Engine
 from ski_lift.core.monitor.logger.file import FileCommandLogger
 from ski_lift.core.monitor.logger.rabbit_mq import RabbitMQCommandLogger
 from ski_lift.core.view.cli_view import CommandLineInterfaceView
@@ -12,12 +8,13 @@ from ski_lift.core.command.result.serializer.pretty_string import PrettyResultSt
 from ski_lift.core.command.result.serializer.json_bytes import JSONBytesResultSerializer
 from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
 import pika
-from ski_lift.core.remote.suggestion.rabbit_mq_suggestion_forwarder import RabbitMQSuggestionForwarder
 import os
 from ski_lift.core.sensor.sensor_data_generator import SensorDataGenerator
 from ski_lift.core.sensor.observer.rabbitmq_observer import RabbitMQObserver
 from threading import Thread
-from ski_lift import __version__
+from ski_lift.core.utils import get_lift_id_or_exit
+from ski_lift.core.controller import Controller
+from ski_lift.use_cases import create_controller
 
 
 def setup_sensor(lift_id: str, pika_producer: PikaProducer) -> None:
@@ -53,21 +50,11 @@ def create_pika_producer() -> PikaProducer:
 
 
 def main() -> int:
-    print(f'version: {__version__.__version__}')
-    lift_id: str = os.environ.get('LIFT_ID')
-    try:
-        lift_id = sys.argv[1]
-    except IndexError:
-        if lift_id is None:
-            print('Usage: python -m ski_lift <lift_id>')
-            return 1
+    lift_id: str = get_lift_id_or_exit()
 
-    # create an example authenticator and register a card number
-    authenticator = InMemoryAuthenticator()
-    authenticator.add('secret')
+    controller: Controller = create_controller()
 
-    # create a controller which needs an engine and an authorizer
-    controller = SkiLiftController(engine=Engine(), authorizer=SkiLiftAuthorizer(authenticator=authenticator))
+
     command_logger = FileCommandLogger(PrettyStringDescriptorSerializer(), PrettyResultStringSerializer())
     command_logger.attach_to(controller)
 
@@ -82,7 +69,7 @@ def main() -> int:
     )
     rabbit_logger.attach_to(controller)
 
-    cli = CommandLineInterfaceView(controller=controller)
+    cli = CommandLineInterfaceView(lift_id=lift_id, controller=controller)
 
     controller.start()
     cli.start_handling_user_inputs()

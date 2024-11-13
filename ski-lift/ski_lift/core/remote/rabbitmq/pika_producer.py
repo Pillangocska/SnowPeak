@@ -119,5 +119,5 @@ class PikaProducer(object):
             self._channel.close()
 
     def close_connection(self) -> None: 
-        if self._connection is not None:
+        if self._connection is not None and self._connection.is_open:
             self._connection.close()
