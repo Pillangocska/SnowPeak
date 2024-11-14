@@ -1,10 +1,11 @@
 services:
   frontend:
+    image: frontend
+    container_name: frontend
     build:
       context: ./client
       args:
         - ANGULAR_PORT=${ANGULAR_PORT}
-    container_name: frontend
     restart: unless-stopped
     ports:
       - ${ANGULAR_PORT}:${ANGULAR_PORT}
@@ -26,7 +27,7 @@ services:
           memory: 128M
 
   backend:
-    image: backend-v1
+    image: backend
     container_name: backend
     build:
       context: ./backend
