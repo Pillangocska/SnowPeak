@@ -1,4 +1,4 @@
-# ConfigMaps
+################################# CONFIGMAPS #################################
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -15,7 +15,7 @@ data:
   RABBITMQ_USER: "guest"
   RABBITMQ_PASSWORD: "guest"
 ---
-# PVCs
+################################# PVC-S #################################
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -71,15 +71,17 @@ spec:
     requests:
       storage: 1Gi
 ---
-# Frontend Service and Deployment
+################################# FRONTEND #################################
 apiVersion: v1
 kind: Service
 metadata:
   name: frontend
 spec:
+  type: NodePort
   ports:
     - port: 4200
       targetPort: 4200
+      nodePort: 31200
   selector:
     app: frontend
 ---
@@ -123,7 +125,7 @@ spec:
           configMap:
             name: nginx-config
 ---
-# Backend Service and Deployment
+################################# BACKEND #################################
 apiVersion: v1
 kind: Service
 metadata:
@@ -173,7 +175,7 @@ spec:
             - name: KEYCLOAK_AUTH_SERVER_URL
               value: "http://keycloak:8080/auth"
 ---
-# Ski Lifts Deployments
+################################# SKI-LIFT #################################
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -258,12 +260,13 @@ spec:
             - name: RABBITMQ_PORT
               value: "5672"
 ---
-# RabbitMQ Service and Deployment
+################################# RABBIT MQ #################################
 apiVersion: v1
 kind: Service
 metadata:
   name: rabbitmq
 spec:
+  type: NodePort
   ports:
     - name: amqp
       port: 5672
@@ -271,9 +274,11 @@ spec:
     - name: management
       port: 15672
       targetPort: 15672
+      nodePort: 31672
     - name: websocket
       port: 15674
       targetPort: 15674
+      nodePort: 31674
   selector:
     app: rabbitmq
 ---
@@ -333,7 +338,7 @@ spec:
           configMap:
             name: rabbitmq-plugins-config
 ---
-# Keycloak Service and Deployment
+################################# KEYCLOAK #################################
 apiVersion: v1
 kind: Service
 metadata:
@@ -388,7 +393,7 @@ spec:
           configMap:
             name: keycloak-realms-config
 ---
-# Keycloak Postgres Service and Deployment
+################################# Keycloak Postgres #################################
 apiVersion: v1
 kind: Service
 metadata:
@@ -434,7 +439,7 @@ spec:
           persistentVolumeClaim:
             claimName: postgres-data-pvc
 ---
-# Main Database Service and Deployment
+################################# POSTGRES #################################
 apiVersion: v1
 kind: Service
 metadata:

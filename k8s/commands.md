@@ -37,6 +37,10 @@ kubectl delete -f <filename>.yaml
 kubectl get configmaps
 # view details of configmap
 kubectl describe configmap <configm-name>
+# get URLs for all exposed services
+minikube service list
+# get minikube ip
+minikube ip
 # see dashboard:
 minikube dashboard
 # stop minikube
@@ -50,7 +54,3 @@ kubectl create configmap nginx-config --from-file=nginx.conf=./client/nginx.conf
 # if we want to update:
 kubectl delete configmap keycloak-realms-config
 kubectl create configmap keycloak-realms-config --from-file=./keycloak/realms/
-# or
-# Update ConfigMap and restart deployment in one go
-kubectl create configmap keycloak-realms-config --from-file=./keycloak/realms/ --dry-run=client -o yaml | kubectl apply -f -
-kubectl rollout restart deployment keycloak

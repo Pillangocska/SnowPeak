@@ -60,3 +60,7 @@ springdoc:
     display-operation-id: true
     use-root-path: true
     filter: true
+
+config:
+  directory:
+    path: ${SPRING_BOOT_LIFT_CONFIGS_LOCATION:config/}
