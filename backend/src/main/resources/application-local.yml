@@ -54,3 +54,7 @@ springdoc:
         display-operation-id: true
         use-root-path: true
         filter: true
+
+config:
+    directory:
+        path: "config/"
