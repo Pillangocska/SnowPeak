@@ -1,0 +1,490 @@
+# ConfigMaps
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  ANGULAR_PORT: "4200"
+  SPRING_BOOT_PORT: "8080"
+  LIFT_1_ID: "lift1"
+  LIFT_2_ID: "lift2"
+  LIFT_3_ID: "lift3"
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "postgres"
+  POSTGRES_DB: "postgres"
+  RABBITMQ_USER: "guest"
+  RABBITMQ_PASSWORD: "guest"
+---
+# PVCs
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-logs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-postgres-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-postgres-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# Frontend Service and Deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  ports:
+    - port: 4200
+      targetPort: 4200
+  selector:
+    app: frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 4200
+          env:
+            - name: BACKEND_URL
+              value: "http://backend:8080"
+            - name: RABBITMQ_WS_URL
+              value: "ws://rabbitmq:15674/ws"
+          resources:
+            limits:
+              memory: "256Mi"
+            requests:
+              memory: "128Mi"
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+---
+# Backend Service and Deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: backend-v1:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "docker"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://db:5432/postgres"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_PASSWORD
+            - name: KEYCLOAK_AUTH_SERVER_URL
+              value: "http://keycloak:8080/auth"
+---
+# Ski Lifts Deployments
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ski-lift-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ski-lift-1
+  template:
+    metadata:
+      labels:
+        app: ski-lift-1
+    spec:
+      containers:
+        - name: ski-lift
+          image: krisztianszenasi/ski-lift:latest
+          env:
+            - name: LIFT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_ID
+            - name: RABBITMQ_HOST
+              value: "rabbitmq"
+            - name: RABBITMQ_PORT
+              value: "5672"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ski-lift-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ski-lift-2
+  template:
+    metadata:
+      labels:
+        app: ski-lift-2
+    spec:
+      containers:
+        - name: ski-lift
+          image: krisztianszenasi/ski-lift:latest
+          env:
+            - name: LIFT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_ID
+            - name: RABBITMQ_HOST
+              value: "rabbitmq"
+            - name: RABBITMQ_PORT
+              value: "5672"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ski-lift-3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ski-lift-3
+  template:
+    metadata:
+      labels:
+        app: ski-lift-3
+    spec:
+      containers:
+        - name: ski-lift
+          image: krisztianszenasi/ski-lift:latest
+          env:
+            - name: LIFT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_ID
+            - name: RABBITMQ_HOST
+              value: "rabbitmq"
+            - name: RABBITMQ_PORT
+              value: "5672"
+---
+# RabbitMQ Service and Deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+    - name: management
+      port: 15672
+      targetPort: 15672
+    - name: websocket
+      port: 15674
+      targetPort: 15674
+  selector:
+    app: rabbitmq
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+            - containerPort: 15674
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_PASSWORD
+          resources:
+            limits:
+              memory: "512Mi"
+            requests:
+              memory: "256Mi"
+          volumeMounts:
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq
+            - name: rabbitmq-logs
+              mountPath: /var/log/rabbitmq
+            - name: rabbitmq-config
+              mountPath: /etc/rabbitmq/enabled_plugins
+              subPath: enabled_plugins
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: rabbitmq-data-pvc
+        - name: rabbitmq-logs
+          persistentVolumeClaim:
+            claimName: rabbitmq-logs-pvc
+        - name: rabbitmq-config
+          configMap:
+            name: rabbitmq-plugins-config
+---
+# Keycloak Service and Deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: keycloak
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:22.0.5
+          args: ["start-dev", "--import-realm"]
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+            - name: KC_FEATURES
+              value: "preview"
+            - name: KC_DB
+              value: "postgres"
+            - name: KC_DB_URL
+              value: "jdbc:postgresql://keycloak-postgres:5432/keycloak"
+            - name: KC_DB_USERNAME
+              value: "keycloak"
+            - name: KC_DB_PASSWORD
+              value: "password"
+          volumeMounts:
+            - name: keycloak-realms
+              mountPath: /opt/keycloak/data/import
+      volumes:
+        - name: keycloak-realms
+          configMap:
+            name: keycloak-realms-config
+---
+# Keycloak Postgres Service and Deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-postgres
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: keycloak-postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak-postgres
+  template:
+    metadata:
+      labels:
+        app: keycloak-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "keycloak"
+            - name: POSTGRES_USER
+              value: "keycloak"
+            - name: POSTGRES_PASSWORD
+              value: "password"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data-pvc
+---
+# Main Database Service and Deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14.1-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_DB
+          volumeMounts:
+            - name: app-postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: app-postgres-data
+          persistentVolumeClaim:
+            claimName: app-postgres-data-pvc
