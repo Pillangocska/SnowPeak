@@ -385,7 +385,6 @@ class ExampleConsumer(object):
             LOGGER.info('Stopping')
             if self._consuming:
                 self.stop_consuming()
-                self._connection.ioloop.start()
             else:
                 self._connection.ioloop.stop()
             LOGGER.info('Stopped')
