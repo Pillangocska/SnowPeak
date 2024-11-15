@@ -68,6 +68,7 @@ class PikaProducer(object):
             exchange=self._exchange,
             exchange_type=self._exchange_type,
             callback=self.setup_exchange_ok,
+            durable=True,
         )
 
     def on_channel_closed(self, channel, reason) -> None:
