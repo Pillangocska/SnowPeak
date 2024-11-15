@@ -13,7 +13,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Exchange exchange() {
-        return new TopicExchange(EXCHANGE_NAME, false, false);
+        return new TopicExchange(EXCHANGE_NAME);
     }
 
     @Bean
