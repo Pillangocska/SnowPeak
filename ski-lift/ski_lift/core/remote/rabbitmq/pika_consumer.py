@@ -189,7 +189,9 @@ class ExampleConsumer(object):
         self._channel.exchange_declare(
             exchange=self._exchange,
             exchange_type=self._exchange_type,
-            callback=cb)
+            callback=cb,
+            durable=True,
+        )
 
     def on_exchange_declareok(self, _unused_frame, userdata):
         """Invoked by pika when RabbitMQ has finished the Exchange.Declare RPC

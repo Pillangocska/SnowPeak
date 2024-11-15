@@ -3,7 +3,8 @@
 import datetime
 import json
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
+from re import M
 
 from camel_converter import dict_to_snake
 
@@ -46,10 +47,21 @@ class Suggestion:
     category: SuggestionCategory
     message: str
 
+    def __post_init__(self):
+        if isinstance(self.time, str):
+            self.time = datetime.datetime.fromisoformat(self.time)
+        if isinstance(self.category, str):
+            self.category = SuggestionCategory(self.category.upper())
+
     @classmethod
     def from_dict(cls, data: dict) -> 'Suggestion':
         try:
-            return cls(**data)
+            return cls(
+                sender_card_number=data.get('user'),
+                time=data.get('timestamp'),
+                category=data.get('severity'),
+                message=data.get('message'),
+            )
         except TypeError as exc:
             print(exc)
             return None

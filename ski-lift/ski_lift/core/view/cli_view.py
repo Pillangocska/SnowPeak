@@ -5,8 +5,6 @@ from typing import Any
 
 from ..command.result.object import MessageReportCommandResult
 from ski_lift import __version__
-from ski_lift.core.command.descriptor.object import \
-    ChangeStateCommandDescriptor
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
@@ -16,7 +14,6 @@ from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  RemoveCardCommandResult)
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
 from ski_lift.core.view.base_view import BaseView
-from tests.entity import command
 
 
 DEFAULT_HELP_TEXT: str = """
@@ -94,7 +91,7 @@ class CommandLineInterfaceView(BaseView):
                 match(command_name):
                     case 'insert_card': self.insert_card(*args)
                     case 'remove_card': self.remove_card()
-                    case 'change_state': self.change_state(self.parse_to_engine_option(*args))
+                    case 'change_state': self.change_state(*args)
                     case 'display_status': self.display_status()
                     case 'emergency_stop': self.emergency_stop()
                     case 'report': self.message_report(*args)
@@ -109,15 +106,6 @@ class CommandLineInterfaceView(BaseView):
             except TypeError as type_exc:
                 print(f'Incorrect arguments for command "{command_name}". Type "help" to display correct usage.')
                 
-
-    def parse_to_engine_option(self, option_str: str) -> ChangeStateCommandDescriptor.Option:
-        match(option_str):
-            case 'max_steam': return ChangeStateCommandDescriptor.Option.MAX_STEAM
-            case 'full_steam': return ChangeStateCommandDescriptor.Option.FULL_STEAM
-            case 'half_steam': return ChangeStateCommandDescriptor.Option.HALF_STEAM
-            case 'stopped': return ChangeStateCommandDescriptor.Option.STOP
-            case _: raise self.UnsupportedChangeStateOption()
-
     def process_insert_card_result(self, result: InsertCardCommandResult) -> Any:
         self.handle_result(result, 'CARD ACCEPTED')
 
@@ -141,7 +129,7 @@ class CommandLineInterfaceView(BaseView):
 
     def handle_result(self, result: CommandResult, message_on_success: str):
         if result.outcome == CommandResult.OutCome.DELAYED:
-            print(f'Type "abort {result.command.id}" to abort it.\n\n>', end='')
+            print(f'Type "abort {result.command.id}" to abort it.\n', end='')
         elif result.is_successful:
             print(message_on_success)
         else:
