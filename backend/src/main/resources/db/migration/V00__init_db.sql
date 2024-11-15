@@ -17,7 +17,6 @@ create table lift(
 create table log(
     log_id          uuid            not null primary key,
     log_lift_id     uuid            not null,
-    log_queue_name  text            not null,
     log_payload     json            not null,
     log_time        timestamp       not null,
 

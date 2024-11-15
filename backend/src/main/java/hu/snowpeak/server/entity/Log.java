@@ -25,10 +25,6 @@ public class Log extends AbstractBaseEntity {
     @JoinColumn(name = "log_lift_id")
     private Lift lift;
 
-    // TODO: Enum legyen majd szerintem
-    @Column(name = "log_queue_name")
-    private String queueName;
-
     @Column(name = "log_payload")
     private String payload;
 
