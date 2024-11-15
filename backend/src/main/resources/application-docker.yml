@@ -57,7 +57,7 @@ spring:
 
 rabbitmq:
   exchange:
-    name: exchange-name
+    name: topic_skilift
 
 keycloak:
   realm: snow-peak

@@ -17,7 +17,7 @@ public class RabbitMQProducer {
     public void sendMessage(String message) {
         rabbitTemplate.convertAndSend(
                 exchangeName,
-                "routing-key",  // This should match what you pass to the Python script
+                "skilift.#",  // This should match what you pass to the Python script
                 message
         );
     }
