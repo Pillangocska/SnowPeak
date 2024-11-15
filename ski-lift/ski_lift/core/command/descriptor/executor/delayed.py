@@ -26,6 +26,7 @@ class DelayedCommandExecutor(CommandExecutor):
         self._lock = Lock()
         self._stop_event = Event()
         self._executor_thread = Thread(target=self._process_delayed_commands, daemon=True)
+        self._abort_in_progress = False
         super().__init__(*args, **kwargs)
 
     def __enter__(self):
@@ -66,14 +67,16 @@ class DelayedCommandExecutor(CommandExecutor):
         Thread(target=self._unregister_delayed_command, args=(command, ), daemon=True).start()
 
     def abort(self, id: int):
+        self._abort_in_progress = True
         self.remove(id)
+        self._abort_in_progress = False
 
     def remove(self, id: int):
         with self._lock:
             self._delayed_commands = [
                 command
                 for command in self._delayed_commands
-                if command.id != id
+                if command.id != int(id)
             ]
 
     def _register_delayed_command(self, command: CommandDescriptor):
@@ -94,8 +97,10 @@ class DelayedCommandExecutor(CommandExecutor):
                 for command in self._delayed_commands:
                     if self.is_delayed(command):
                         to_keep.append(command)
-                    else:
+                    elif not self._abort_in_progress:
                         self.execute(command)
+                    else:
+                        to_keep.append(command)
                 self._delayed_commands = to_keep
 
     def _create_delayed_result(self, command: CommandDescriptor) -> CommandResult:
