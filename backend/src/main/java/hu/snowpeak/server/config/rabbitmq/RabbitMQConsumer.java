@@ -23,7 +23,7 @@ public class RabbitMQConsumer {
     @Autowired
     private LiftRepository liftRepository;
 
-    @RabbitListener(queues = "#{queue.name}")  // Reference the anonymous queue by its bean name
+    @RabbitListener(queues = "#{queue.name}")  
     public void receiveMessage(
             String message,
             @Header(value = AmqpHeaders.RECEIVED_ROUTING_KEY, required = false) String routingKey) {
