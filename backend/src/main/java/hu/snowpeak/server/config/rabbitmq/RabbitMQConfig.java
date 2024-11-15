@@ -6,17 +6,19 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
+    private static final String EXCHANGE_NAME = "topic_skilift";
+    private static final String EXCHANGE_TYPE = "topic";
     private static final String QUEUE_NAME = "snow-peak-queue";
-    private static final String ROUTING_KEY = "routing-key";
+    private static final String ROUTING_KEY = "skilift.#";
 
     @Bean
     public Exchange exchange() {
-        return new TopicExchange("exchange-name");
+        return new TopicExchange(EXCHANGE_NAME, false, false);
     }
 
     @Bean
     public Queue queue() {
-        return new Queue(QUEUE_NAME, true, false, false);  // durable, not exclusive, not auto-delete
+        return new Queue(QUEUE_NAME);
     }
 
     @Bean

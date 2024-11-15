@@ -11,7 +11,7 @@ public class RabbitMQConsumer {
 
     @RabbitListener(queues = "#{queue.name}")  // Reference the anonymous queue by its bean name
     public void receiveMessage(String message) {
-        // Format the message like the Python script does
+        System.out.println("Received message!!!: " + message);
         try {
             ObjectMapper mapper = new ObjectMapper();
             Object json = mapper.readValue(message, Object.class);
