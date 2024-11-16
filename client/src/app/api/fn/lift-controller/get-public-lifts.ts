@@ -10,11 +10,11 @@ import { RequestBuilder } from '../../request-builder';
 
 import { LiftResponseModel } from '../../models/lift-response-model';
 
-export interface GetLifts$Params {
+export interface GetPublicLifts$Params {
 }
 
-export function getLifts(http: HttpClient, rootUrl: string, params?: GetLifts$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<LiftResponseModel>>> {
-  const rb = new RequestBuilder(rootUrl, getLifts.PATH, 'get');
+export function getPublicLifts(http: HttpClient, rootUrl: string, params?: GetPublicLifts$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<LiftResponseModel>>> {
+  const rb = new RequestBuilder(rootUrl, getPublicLifts.PATH, 'get');
   if (params) {
   }
 
@@ -28,4 +28,4 @@ export function getLifts(http: HttpClient, rootUrl: string, params?: GetLifts$Pa
   );
 }
 
-getLifts.PATH = '/lifts';
+getPublicLifts.PATH = '/public-lifts';
