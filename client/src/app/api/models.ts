@@ -4,3 +4,4 @@
 
 export { LiftResponseModel } from './models/lift-response-model';
 export { LogResponseModel } from './models/log-response-model';
+export { PrivateLiftResponseModel } from './models/private-lift-response-model';

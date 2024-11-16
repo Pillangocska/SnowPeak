@@ -1,0 +1,6 @@
+<h3 mat-dialog-title>Biztosan leállítja a liftet?</h3>
+<mat-dialog-content>Amennyiebn vészleállítással leállítja a liftet, azonnal megáll az egész felvonó.</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-flat-button mat-dialog-close>Mégsem</button>
+    <button mat-flat-button [mat-dialog-close]="true" color="warn">VÉSZLEÁLLÍTÁS</button>
+</mat-dialog-actions>
