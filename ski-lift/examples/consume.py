@@ -30,7 +30,7 @@ def main() -> int:
         )
     )
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange_name, exchange_type='topic')
+    channel.exchange_declare(exchange=exchange_name, exchange_type='topic', durable=True)
     result = channel.queue_declare('', exclusive=True)
     queue_name = result.method.queue
     channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
