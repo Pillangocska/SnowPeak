@@ -63,7 +63,7 @@ class Controller(
         if self.engine_state == EngineState.STOPPED:
             return -1
         multiplier: float = 0.5 if self.engine_state == EngineState.HALF_STEAM else 1.0
-        metrics: dict = self._queue_status.get_performance_metrics(multiplier=multiplier)
+        metrics: dict = self._queue_status.get_performance_metrics(speed_multiplier=multiplier)
         return metrics.get('waiting_time [min]', -1)
         
 
