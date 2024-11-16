@@ -64,10 +64,11 @@ class CommandPanel:
             )
         )
 
-    def emergency_stop(self) -> None:
+    def emergency_stop(self, delay: int = 0) -> None:
         self._controller.execute(
             CommandDescriptorFactory.create_emergency_stop(
-                user_card=self.inserted_card
+                user_card=self.inserted_card,
+                delay=delay,
             )
         )
 
