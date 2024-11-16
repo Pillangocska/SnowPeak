@@ -42,7 +42,7 @@ kubectl create configmap nginx-config --from-file=nginx.conf=./client/nginx.conf
 
 # Apply Kubernetes manifests from k8s folder
 Write-Host "🎮 Applying Kubernetes manifests..." -ForegroundColor Yellow
-kubectl apply -f ./k8s/k8s_v1.yaml
+kubectl apply -f ./k8s/manifest.yaml
 
 # Wait for pods to be ready
 Write-Host "⏳ Waiting for pods to be ready..." -ForegroundColor Yellow
