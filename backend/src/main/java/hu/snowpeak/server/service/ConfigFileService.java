@@ -103,6 +103,8 @@ public class ConfigFileService {
 
     public void processConfigDirectory(String directoryPath) throws IOException {
         try (Stream<Path> paths = Files.walk(Paths.get(directoryPath))) {
+            liftRepository.deleteAll();
+
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".env"))
                     .forEach(path -> {
