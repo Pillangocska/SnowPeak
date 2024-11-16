@@ -29,6 +29,7 @@ class ErlangCModel:
         """
         self.arrival_rate = arrival_rate
         self.line_speed = line_speed
+        self.line_speed_max = line_speed
         self.carrier_capacity = carrier_capacity
         self.carrier_spacing = carrier_spacing
         self.carriers_loading = carriers_loading
@@ -164,7 +165,7 @@ class ErlangCModel:
             'space_needed': space_needed
         }
 
-    def get_performance_metrics(self) -> Dict[str, float]:
+    def get_performance_metrics(self, speed_multiplier: float = 1.0) -> Dict[str, float]:
         """
         Performance metrics for the lift queuing system.
 
@@ -172,6 +173,7 @@ class ErlangCModel:
             Dict containing all relevant performance metrics including
             wait times, queue lengths, and system utilization.
         """
+        self.line_speed = speed_multiplier * self.line_speed_max
         wait_metrics = self.calculate_wait_time()
         queue_metrics = self.calculate_queue_length()
         waiting_time = math.ceil(wait_metrics['average_wait'])
