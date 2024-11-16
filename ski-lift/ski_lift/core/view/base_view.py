@@ -37,8 +37,16 @@ class BaseView(CommandPanel, CommandResultMonitor):
 
     @abstractmethod
     def start_handling_user_inputs(self) -> None:
-        pass
+        """Start handling user inputs.
+
+        This function is responsible for starting the process of handling user
+        inputs. It typically blocks the main thread.
+        """
 
     @abstractmethod
     def display_suggestion(self, suggestion: Suggestion) -> None:
-        pass
+        """Display suggestion.
+        
+        This function is responsible for displaying a suggestion on the user
+        interface.
+        """

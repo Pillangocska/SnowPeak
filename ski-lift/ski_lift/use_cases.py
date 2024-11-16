@@ -21,21 +21,38 @@ from ski_lift.core.sensor import RabbitMQObserver, SensorDataGenerator
 from ski_lift.core.remote import PikaConsumer, PikaProducer, RabbitMQCommunicator
 
 
-def attach_loggers_to(controller: Controller, producer: PikaProducer):
+def attach_loggers_to(controller: Controller, producer: PikaProducer) -> None:
+    """Attach loggers to the controller.
+
+    Args:
+        controller (Controller): controller to attach to
+        producer (PikaProducer): producer that is used by some loggers
+    """
     attach_file_logger_to(controller)
-    attach_rabbit_mq_logger_to(controller, controller.lift_id, producer)
+    attach_rabbit_mq_logger_to(controller, producer)
 
 
 def attach_file_logger_to(controller: Controller):
+    """Attach a file logger to the given controller.
+
+    Args:
+        controller (Controller): controller to attach to.
+    """
     command_logger = FileCommandLogger(PrettyStringDescriptorSerializer(), PrettyResultStringSerializer())
     command_logger.attach_to(controller)
 
-def attach_rabbit_mq_logger_to(controller: Controller, lift_id: str, producer: PikaProducer):
+def attach_rabbit_mq_logger_to(controller: Controller, producer: PikaProducer):
+    """Attach a rabbit mq based command logger to the given controller.
+
+    Args:
+        controller (Controller): controller to attach to.
+        producer (PikaProducer): _description_
+    """
     rabbit_logger = RabbitMQCommandLogger(
         descriptor_serializer=JSONBytesDescriptorSerializer(),
         result_serializer=JSONBytesResultSerializer(),
         pika_producer=producer,
-        lift_id=lift_id,
+        lift_id=controller.lift_id,
     )
     rabbit_logger.attach_to(controller)
 
