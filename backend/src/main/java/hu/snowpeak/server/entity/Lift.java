@@ -52,4 +52,9 @@ public class Lift extends AbstractBaseEntity {
             joinColumns = {@JoinColumn(name = "worker_lift_id", referencedColumnName = "lift_id", nullable = false)})
     @Column(name = "worker_id")
     private Set<UUID> workers;
+
+    @PreRemove
+    private void removeWorkers() {
+        workers.clear();
+    }
 }

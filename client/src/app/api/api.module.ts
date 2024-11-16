@@ -6,8 +6,8 @@ import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core
 import { HttpClient } from '@angular/common/http';
 import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 
-import { LogControllerService } from './services/log-controller.service';
 import { LiftControllerService } from './services/lift-controller.service';
+import { LogControllerService } from './services/log-controller.service';
 
 /**
  * Module that provides all services and configuration.
@@ -17,8 +17,8 @@ import { LiftControllerService } from './services/lift-controller.service';
   exports: [],
   declarations: [],
   providers: [
-    LogControllerService,
     LiftControllerService,
+    LogControllerService,
     ApiConfiguration
   ],
 })
