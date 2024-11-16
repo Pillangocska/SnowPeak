@@ -15,6 +15,7 @@ from ski_lift.core.monitor.logger import FileCommandLogger, RabbitMQCommandLogge
 from ski_lift.core.command.descriptor.serializer import PrettyStringDescriptorSerializer, JSONBytesDescriptorSerializer
 from ski_lift.core.command.result.serializer import PrettyResultStringSerializer, JSONBytesResultSerializer
 from ski_lift.core.remote.communicator.rabbit_mq import RabbitMQCommunicator
+from ski_lift.core.math.erlang_c import ErlangCModel
 
 
 def attach_loggers_to(controller: Controller, producer: PikaProducer):
@@ -43,7 +44,24 @@ def create_controller(lift_id: str, producer: PikaProducer) -> Controller:
         lift_id=lift_id,
         engine=Engine(),
         authorizer=SkiLiftAuthorizer(authenticator=create_authenticate_from_env()),
-        remote_communicator=RabbitMQCommunicator(lift_id=lift_id, producer=producer)
+        remote_communicator=RabbitMQCommunicator(producer=producer),
+        queue_status=create_erlang_c_model(),
+    )
+
+
+def create_erlang_c_model() -> ErlangCModel:
+    return ErlangCModel(
+        start_lat=os.environ.get('START_LAT', 45.5),
+        start_lon=os.environ.get('START_LON', 73.5),
+        start_elevation=os.environ.get('START_ELEVATION', 1200),
+        end_lat=os.environ.get('END_LAT', 45.52),
+        end_lon=os.environ.get('END_LON', 73.48),
+        end_elevation=os.environ.get('END_ELEVATION', 2200),
+        arrival_rate=os.environ.get('ARRIVAL_RATE', 1000),          
+        line_speed=os.environ.get('LINE_SPEED', 4),
+        carrier_capacity=os.environ.get('CARRIER_CAPACITY', 4),
+        carrier_spacing=os.environ.get('CARRIER_SPACING', 15),
+        carriers_loading=os.environ.get('CARRIERS_LOADING', 1),
     )
 
 
