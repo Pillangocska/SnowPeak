@@ -11,17 +11,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
+import java.io.StringReader;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
 public class RabbitMQConsumer {
     private static final String QUEUE_NAME = "snow-peak-queue";
 
+    HashMap<UUID, Double> temperatures = new HashMap<>();
+
     @Autowired
     private LogRepository logRepository;
     @Autowired
     private LiftRepository liftRepository;
+    @Autowired
+    private RabbitMQProducer rabbitMQProducer;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @RabbitListener(queues = "#{queue.name}")  
     public void receiveMessage(
@@ -29,6 +38,8 @@ public class RabbitMQConsumer {
             @Header(value = AmqpHeaders.RECEIVED_ROUTING_KEY, required = false) String routingKey) {
         System.out.println("Received message!!!: " + message);
         System.out.println("Received message: " + message);
+
+        UUID liftUuid = null;
 
         try {
             // Parse the lift_id from routing key
@@ -40,7 +51,7 @@ public class RabbitMQConsumer {
             }
 
             // Fetch the Lift entity
-            UUID liftUuid = UUID.fromString(liftId);
+            liftUuid = UUID.fromString(liftId);
             Lift lift = liftRepository.findById(liftUuid)
                     .orElseThrow(() -> new IllegalArgumentException("Lift not found for ID: " + liftId));
 
@@ -63,6 +74,52 @@ public class RabbitMQConsumer {
             System.err.println("Error processing the message: " + e.getMessage());
             e.printStackTrace();
         }
+
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Convert JSON string to a Map
+            Map<String, Object> map = objectMapper.readValue(message, Map.class);
+
+            if(map.get("type").equals("temperature") && liftUuid != null) {
+                double newTemperature = Double.parseDouble(map.get("value").toString());
+                if(temperatures.containsKey(liftUuid)) {
+
+                    if(isMoreThan5PercentDifferent(temperatures.get(liftUuid), newTemperature)){
+
+                        System.out.println("WARN!! Invalid temperature value!");
+
+                        //send warning message to the lift for invalid temperature value
+                        Map<String, Object> suggestion = new HashMap<>();
+                        suggestion.put("messageKind", "suggestion");
+                        suggestion.put("user", "abc123");
+                        suggestion.put("severity", "WARNING");
+                        suggestion.put("timestamp", LocalDateTime.now().toString());
+                        suggestion.put("message", String.format(
+                                "Invalid temperature value detected: %f. Previous value: %f",
+                                newTemperature,
+                                temperatures.get(liftUuid)
+                        ));
+
+                        // Convert suggestion to JSON string
+                        String suggestionString = objectMapper.writeValueAsString(suggestion);
+
+                        System.out.println(suggestionString);
+
+                        // Send the suggestion message using the lift's UUID as routing key
+                        rabbitMQProducer.sendSuggestion(suggestionString, liftUuid.toString());
+                    }
+                    else {
+                        temperatures.replace(liftUuid, newTemperature);
+                    }
+                }
+                else {
+                    temperatures.put(liftUuid, newTemperature);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error processing message data: " + e.getMessage());
+        }
     }
 
     private String extractLiftId(String routingKey) {
@@ -72,5 +129,11 @@ public class RabbitMQConsumer {
         // Assume routing key format is "skilift.<lift_id>.logs..."
         String[] parts = routingKey.split("\\.");
         return parts.length > 1 ? parts[1] : null;
+    }
+
+    private static boolean isMoreThan5PercentDifferent(double baseValue, double compareValue) {
+        double threshold = baseValue * 0.05;
+
+        return Math.abs(baseValue - compareValue) > threshold;
     }
 }
