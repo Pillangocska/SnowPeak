@@ -1,5 +1,57 @@
-@if (!keycloakService.isLoggedIn()) {
-  <button mat-raised-button (click)="login()">{{ "Belépés" }}</button>
-} @else {
-  <button mat-raised-button (click)="logout()">{{ "Kilépés" }}</button>
+
+  @if (!keycloakService.isLoggedIn()) {
+    <button class="auth-button" mat-flat-button (click)="login()">{{ "Belépés" }}</button>
+  } @else {
+    <button class="auth-button" mat-flat-button (click)="logout()">{{ "Kilépés" }}</button>
+  }
+
+<mat-divider class="divider"></mat-divider>
+
+@if(!!keycloakService.isLoggedIn()) {
+  <label class="label">Elérhető liftek:</label>
+  
+  @if((lifts?.length ?? 0) > 0) {
+    <mat-chip-listbox>
+      @for (lift of lifts; track lift) {
+        <mat-chip-option (selectionChange)="goToLift(lift.id ?? '')">{{lift.id}}</mat-chip-option>
+      }
+    </mat-chip-listbox>
+    
+    <mat-card class="log-card">
+      <label class="label">Szenzor adatok:</label>
+      <div #logContainer class="log-container" [scrollTop]="logContainer.scrollHeight">
+        @for (log of logs; track log) {
+          <p class="log-line">{{ log | json }}</p>
+        }
+        @empty {
+          <p class="sensor-notice">Válasszon az elérhető liftek közül, hogy lássa a szenzoradatokat!</p>
+        }
+      </div>
+    </mat-card>
+  }
+}
+@else {
+  <p>Jelentkezzen be a felvonók kezeléséhez!</p>
+}
+
+@if(selectedLiftId) {
+
+  <section class="action-container">
+    <mat-card class="action-items-container">
+      <label class="card-label">Ütemezés</label>
+      <button mat-flat-button type="button" [disabled]="liftStatus === 'STOPPED'" (click)="liftStatus = 'STOPPED'">{{ "Leállítás" }}</button>
+      <button mat-flat-button type="button" [disabled]="liftStatus === 'FULL_STEAM'" (click)="liftStatus = 'FULL_STEAM'">{{ "Teljes gőz" }}</button>
+      <button mat-flat-button type="button" [disabled]="liftStatus === 'HALF_STEAM'" (click)="liftStatus = 'HALF_STEAM'">{{ "Fél gőz" }}</button>
+    </mat-card>
+  
+    <mat-card class="action-items-container action-items-container--message">
+      <label class="card-label">Üzenet</label>
+      <input type="text" [(ngModel)]="message">
+      <button mat-flat-button type="button" [disabled]="!message?.length" (click)="sendMessage()">{{ "Küldés" }}</button>
+    </mat-card>
+  
+    <mat-card class="action-items-container">
+      <button mat-flat-button type="button" [disabled]="liftStatus === 'STOPPED'" color="warn" (click)="emergencyStop()">{{ "VÉSZLEÁLLÁS" }}</button>
+    </mat-card>
+  </section>
 }

@@ -22,7 +22,7 @@ export class PublicComponent implements OnInit, AfterViewInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.liftService.getLifts().subscribe((lifts) => {
+    this.liftService.getPublicLifts().subscribe((lifts) => {
       this.lifts = lifts;
       this.initLifts();
     });
@@ -59,6 +59,7 @@ export class PublicComponent implements OnInit, AfterViewInit {
   }
 
   initLifts(): void {
+    console.log(this.lifts);
     this.lifts?.forEach((lift) => {
       const latlngs = [
         new Leaflet.LatLng(lift.startLatitude ?? 0, lift.startLongitude ?? 0),
