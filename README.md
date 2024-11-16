@@ -29,7 +29,7 @@ Before installation, ensure you have the following dependencies installed:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/snowpeak.git
+   git clone https://github.com/Pillangocska/SnowPeak.git
    cd snowpeak
    ```
 
