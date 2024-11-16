@@ -1,15 +1,15 @@
 """Suggestion forwarder."""
 
 from abc import abstractmethod
-from threading import Event, Thread
+from typing import TYPE_CHECKING
 
-from ski_lift.core.controller import Controller
-from ski_lift.core.view.base_view import BaseView
+if TYPE_CHECKING:
+    from ski_lift.core.view import BaseView
 
 
 class SuggestionForwarder:
     
-    def __init__(self, view: BaseView):
+    def __init__(self, view: 'BaseView'):
         self._view = view
 
     def __enter__(self):

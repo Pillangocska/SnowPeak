@@ -1,20 +1,24 @@
 """RabbitMQ based emergency stop handler."""
 
-from ski_lift.core.remote.emergency_stop.base import RemoteEmergencyStopHandler
-from ski_lift.core.controller import Controller
-import os
-from ski_lift.core.remote.rabbitmq.pika_consumer import PikaConsumer
-import pika 
 import json
-from camel_converter import dict_to_snake
-from ski_lift.core.remote.suggestion.suggestion import Suggestion
+import os
 from datetime import datetime
-from ski_lift.core.view import BaseView
+from typing import TYPE_CHECKING
+
+import pika
+from camel_converter import dict_to_snake
+
+from ski_lift.core.remote.emergency_stop.base import RemoteEmergencyStopHandler
+from ski_lift.core.remote.rabbitmq.pika_consumer import PikaConsumer
+from ski_lift.core.remote.suggestion.suggestion import Suggestion
+
+if TYPE_CHECKING:
+    from ski_lift.core.view import BaseView
 
 
 class RabbitMQEmergencyStopHandler(RemoteEmergencyStopHandler):
 
-    def __init__(self, view: BaseView) -> None:
+    def __init__(self, view: 'BaseView') -> None:
         self._consumer: PikaConsumer = PikaConsumer(
             exchange='direct_emergency_stop',
             exchange_type='direct',

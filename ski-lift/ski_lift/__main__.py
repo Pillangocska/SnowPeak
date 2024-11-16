@@ -2,11 +2,13 @@
 
 import sys
 
+from ski_lift.core.remote import (RabbitMQEmergencyStopHandler,
+                                  RabbitMQSuggestionForwarder)
 from ski_lift.core.utils import get_lift_id_or_exit
 from ski_lift.core.view.cli_view import CommandLineInterfaceView
-from ski_lift.use_cases import create_controller, create_pika_producer, setup_sensor, attach_loggers_to
-from ski_lift.core.remote.suggestion.rabbit_mq_suggestion_forwarder import RabbitMQSuggestionForwarder
-from ski_lift.core.remote.emergency_stop.rabbit_mq_emergency_stopper import RabbitMQEmergencyStopHandler
+from ski_lift.use_cases import (attach_loggers_to, create_controller,
+                                create_pika_producer, setup_sensor)
+
 
 def main() -> int:
     lift_id: str = get_lift_id_or_exit()

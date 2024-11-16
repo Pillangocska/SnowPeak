@@ -4,9 +4,6 @@ from abc import abstractmethod
 from typing import Optional
 
 from ski_lift.core.command.command_panel import CommandPanel
-from ski_lift.core.command.descriptor.factory import CommandDescriptorFactory
-from ski_lift.core.command.descriptor.object import \
-    ChangeStateCommandDescriptor
 from ski_lift.core.controller import Controller
 from ski_lift.core.monitor.result.result_monitor import CommandResultMonitor
 from ski_lift.core.remote.suggestion.suggestion import Suggestion

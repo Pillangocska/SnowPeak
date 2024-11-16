@@ -8,7 +8,8 @@ from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  CommandResult,
                                                  DisplayStatusCommandResult,
                                                  EmergencyStopCommandResult,
-                                                 InsertCardCommandResult, MessageReportCommandResult,
+                                                 InsertCardCommandResult,
+                                                 MessageReportCommandResult,
                                                  RemoveCardCommandResult)
 
 

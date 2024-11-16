@@ -1,21 +1,25 @@
 """Ski lift use cases."""
 
 import os
+from threading import Thread
 from typing import List
+
+import pika
 
 from ski_lift.app.entity import SkiLiftAuthorizer, SkiLiftController
 from ski_lift.core.auth import BaseAuthenticator, InMemoryAuthenticator
+from ski_lift.core.command.descriptor.serializer import (
+    JSONBytesDescriptorSerializer, PrettyStringDescriptorSerializer)
+from ski_lift.core.command.result.serializer import (
+    JSONBytesResultSerializer, PrettyResultStringSerializer)
 from ski_lift.core.controller import Controller
 from ski_lift.core.engine import Engine
-from ski_lift.core.remote import PikaProducer
-import pika
-from ski_lift.core.sensor import RabbitMQObserver, SensorDataGenerator
-from threading import Thread
-from ski_lift.core.monitor.logger import FileCommandLogger, RabbitMQCommandLogger
-from ski_lift.core.command.descriptor.serializer import PrettyStringDescriptorSerializer, JSONBytesDescriptorSerializer
-from ski_lift.core.command.result.serializer import PrettyResultStringSerializer, JSONBytesResultSerializer
-from ski_lift.core.remote.communicator.rabbit_mq import RabbitMQCommunicator
 from ski_lift.core.math.erlang_c import ErlangCModel
+from ski_lift.core.monitor.logger import (FileCommandLogger,
+                                          RabbitMQCommandLogger)
+from ski_lift.core.remote import PikaProducer
+from ski_lift.core.remote.communicator.rabbit_mq import RabbitMQCommunicator
+from ski_lift.core.sensor import RabbitMQObserver, SensorDataGenerator
 
 
 def attach_loggers_to(controller: Controller, producer: PikaProducer):

@@ -3,7 +3,6 @@
 from string import Template
 from typing import Any
 
-from ..command.result.object import MessageReportCommandResult
 from ski_lift import __version__
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
@@ -15,6 +14,7 @@ from ski_lift.core.command.result.object import (AbortCommandResult,
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
 from ski_lift.core.view.base_view import BaseView
 
+from ..command.result.object import MessageReportCommandResult
 
 DEFAULT_HELP_TEXT: str = """
 Available commands:
