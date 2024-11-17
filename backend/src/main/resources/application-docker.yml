@@ -40,7 +40,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:9090/realms/snow-peak
+          issuer-uri: http://snow-peak-keycloak:8080/realms/docker-realm
 
   rabbitmq:
     host: rabbitmq
@@ -63,7 +63,7 @@ rabbitmq:
 keycloak:
   realm: snow-peak
   resource: snow-peak
-  auth-server-url: http://keycloak:9090/auth
+  auth-server-url: http://snow-peak-keycloak:8080
   ssl-required: external
   public-client: true
   use-resource-role-mappings: true
