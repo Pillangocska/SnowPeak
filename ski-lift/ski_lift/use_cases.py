@@ -80,9 +80,9 @@ def create_erlang_c_model() -> ErlangCModel:
         end_elevation=float(os.environ.get('END_ELEVATION', 2200)),
         arrival_rate=float(os.environ.get('ARRIVAL_RATE', 1000)),          
         line_speed=float(os.environ.get('LINE_SPEED', 4)),
-        carrier_capacity=float(os.environ.get('CARRIER_CAPACITY', 4)),
+        carrier_capacity=int(os.environ.get('CARRIER_CAPACITY', 4)),
         carrier_spacing=float(os.environ.get('CARRIER_SPACING', 15)),
-        carriers_loading=float(os.environ.get('CARRIERS_LOADING', 1)),
+        carriers_loading=int(os.environ.get('CARRIERS_LOADING', 1)),
     )
 
 
