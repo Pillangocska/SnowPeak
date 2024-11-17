@@ -36,12 +36,6 @@ spring:
       hibernate:
         default-schema: public
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://snow-peak-keycloak:8080/realms/docker-realm
-
   rabbitmq:
     host: rabbitmq
     port: 5672
@@ -59,14 +53,6 @@ spring:
 rabbitmq:
   exchange:
     name: direct_suggestions
-
-keycloak:
-  realm: snow-peak
-  resource: snow-peak
-  auth-server-url: http://snow-peak-keycloak:8080
-  ssl-required: external
-  public-client: true
-  use-resource-role-mappings: true
 
 springdoc:
   enable-native-support: true

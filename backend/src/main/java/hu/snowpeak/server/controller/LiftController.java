@@ -29,7 +29,6 @@ public class LiftController {
 
     @GetMapping("/private-lifts")
     @ResponseStatus(OK)
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<PrivateLiftResponseModel>> getPrivateLifts() {
         return ResponseEntity.ok(liftService.getPrivateLifts());
     }
