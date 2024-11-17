@@ -2,6 +2,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /build
 
 COPY pom.xml .
+COPY config ./config
 RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn clean
