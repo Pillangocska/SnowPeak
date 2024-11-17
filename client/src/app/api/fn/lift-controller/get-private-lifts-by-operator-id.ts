@@ -10,12 +10,14 @@ import { RequestBuilder } from '../../request-builder';
 
 import { PrivateLiftResponseModel } from '../../models/private-lift-response-model';
 
-export interface GetPrivateLifts$Params {
+export interface GetPrivateLiftsByOperatorId$Params {
+  operatorId: string;
 }
 
-export function getPrivateLifts(http: HttpClient, rootUrl: string, params?: GetPrivateLifts$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<PrivateLiftResponseModel>>> {
-  const rb = new RequestBuilder(rootUrl, getPrivateLifts.PATH, 'get');
+export function getPrivateLiftsByOperatorId(http: HttpClient, rootUrl: string, params: GetPrivateLiftsByOperatorId$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<PrivateLiftResponseModel>>> {
+  const rb = new RequestBuilder(rootUrl, getPrivateLiftsByOperatorId.PATH, 'get');
   if (params) {
+    rb.path('operatorId', params.operatorId, {});
   }
 
   return http.request(
@@ -28,4 +30,4 @@ export function getPrivateLifts(http: HttpClient, rootUrl: string, params?: GetP
   );
 }
 
-getPrivateLifts.PATH = '/private-lifts';
+getPrivateLiftsByOperatorId.PATH = '/private-lifts/{operatorId}';

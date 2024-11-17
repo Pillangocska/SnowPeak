@@ -11,8 +11,8 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { getPrivateLifts } from '../fn/lift-controller/get-private-lifts';
-import { GetPrivateLifts$Params } from '../fn/lift-controller/get-private-lifts';
+import { getPrivateLiftsByOperatorId } from '../fn/lift-controller/get-private-lifts-by-operator-id';
+import { GetPrivateLiftsByOperatorId$Params } from '../fn/lift-controller/get-private-lifts-by-operator-id';
 import { getPublicLifts } from '../fn/lift-controller/get-public-lifts';
 import { GetPublicLifts$Params } from '../fn/lift-controller/get-public-lifts';
 import { LiftResponseModel } from '../models/lift-response-model';
@@ -49,27 +49,27 @@ export class LiftControllerService extends BaseService {
     );
   }
 
-  /** Path part for operation `getPrivateLifts()` */
-  static readonly GetPrivateLiftsPath = '/private-lifts';
+  /** Path part for operation `getPrivateLiftsByOperatorId()` */
+  static readonly GetPrivateLiftsByOperatorIdPath = '/private-lifts/{operatorId}';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `getPrivateLifts()` instead.
+   * To access only the response body, use `getPrivateLiftsByOperatorId()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getPrivateLifts$Response(params?: GetPrivateLifts$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<PrivateLiftResponseModel>>> {
-    return getPrivateLifts(this.http, this.rootUrl, params, context);
+  getPrivateLiftsByOperatorId$Response(params: GetPrivateLiftsByOperatorId$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<PrivateLiftResponseModel>>> {
+    return getPrivateLiftsByOperatorId(this.http, this.rootUrl, params, context);
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `getPrivateLifts$Response()` instead.
+   * To access the full response (for headers, for example), `getPrivateLiftsByOperatorId$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
-  getPrivateLifts(params?: GetPrivateLifts$Params, context?: HttpContext): Observable<Array<PrivateLiftResponseModel>> {
-    return this.getPrivateLifts$Response(params, context).pipe(
+  getPrivateLiftsByOperatorId(params: GetPrivateLiftsByOperatorId$Params, context?: HttpContext): Observable<Array<PrivateLiftResponseModel>> {
+    return this.getPrivateLiftsByOperatorId$Response(params, context).pipe(
       map((r: StrictHttpResponse<Array<PrivateLiftResponseModel>>): Array<PrivateLiftResponseModel> => r.body)
     );
   }
