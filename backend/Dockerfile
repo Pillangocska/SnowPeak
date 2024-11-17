@@ -14,6 +14,7 @@ RUN addgroup -S spring && adduser -S spring -G spring && \
     chown -R spring:spring /opt/app
 USER spring:spring
 COPY --from=build /build/target/*.jar app.jar
+COPY --from=build /build/config ./config
 
 EXPOSE ${SPRING_BOOT_PORT}
 

@@ -42,7 +42,7 @@ kubectl create configmap nginx-config --from-file=nginx.conf=./client/nginx.conf
 
 # Apply Kubernetes manifests from k8s folder
 Write-Host "🎮 Applying Kubernetes manifests..." -ForegroundColor Yellow
-kubectl apply -f ./k8s/manifest.yaml
+kubectl apply -f ./k8s/manifest_prod.yaml
 
 # Wait for pods to be ready
 Write-Host "⏳ Waiting for pods to be ready..." -ForegroundColor Yellow
@@ -55,7 +55,7 @@ function Wait-ForPod {
     Write-Host "Waiting for $podPrefix..." -ForegroundColor Gray
     $ready = $false
     $attempts = 0
-    $maxAttempts = 30
+    $maxAttempts = 20
 
     while (-not $ready -and $attempts -lt $maxAttempts) {
         $pod = kubectl get pods | Select-String "^$podPrefix"
@@ -76,8 +76,9 @@ function Wait-ForPod {
 
 # Wait for critical services
 Wait-ForPod "rabbitmq"
-Wait-ForPod "frontend"
 Wait-ForPod "backend"
+#Wait-ForPod "frontend"
+
 
 # Setup port forwarding
 Write-Host "🔌 Setting up port forwarding..." -ForegroundColor Yellow
