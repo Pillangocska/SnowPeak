@@ -10,8 +10,8 @@ from ski_lift.core.remote.emergency_stop.base import RemoteEmergencyStopHandler
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
 
 if TYPE_CHECKING:
-    from ski_lift.core.view import BaseView
     from ski_lift.core.remote.rabbitmq.pika_consumer import PikaConsumer
+    from ski_lift.core.view import BaseView
 
 
 class RabbitMQEmergencyStopHandler(RemoteEmergencyStopHandler):

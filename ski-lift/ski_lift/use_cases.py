@@ -17,8 +17,9 @@ from ski_lift.core.engine import Engine
 from ski_lift.core.math.erlang_c import ErlangCModel
 from ski_lift.core.monitor.logger import (FileCommandLogger,
                                           RabbitMQCommandLogger)
+from ski_lift.core.remote import (PikaConsumer, PikaProducer,
+                                  RabbitMQCommunicator)
 from ski_lift.core.sensor import RabbitMQObserver, SensorDataGenerator
-from ski_lift.core.remote import PikaConsumer, PikaProducer, RabbitMQCommunicator
 
 
 def attach_loggers_to(controller: Controller, producer: PikaProducer) -> None:

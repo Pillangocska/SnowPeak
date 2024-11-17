@@ -7,8 +7,8 @@ from ski_lift.core.remote.suggestion.suggestion_forwarder import \
     SuggestionForwarder
 
 if TYPE_CHECKING:
-    from ski_lift.core.view.base_view import BaseView
     from ski_lift.core.remote.rabbitmq.pika_consumer import PikaConsumer
+    from ski_lift.core.view.base_view import BaseView
 
 
 class RabbitMQSuggestionForwarder(SuggestionForwarder):

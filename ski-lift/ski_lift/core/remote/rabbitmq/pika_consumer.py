@@ -1,16 +1,15 @@
 
 
-from ast import Call
 import functools
 import logging
 import time
+from ast import Call
 from threading import Event, Thread
+from typing import Callable
 
 import pika
 from pika.connection import ConnectionParameters
 from pika.exchange_type import ExchangeType
-from typing import Callable
-
 
 LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
               '-35s %(lineno) -5d: %(message)s')
