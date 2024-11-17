@@ -19,9 +19,9 @@ class RabbitMQSuggestionForwarder(SuggestionForwarder):
         self._consumer: 'PikaConsumer' = create_pika_consumer(
             exchange_name='direct_suggestions',
             exchange_type='direct',
-            lift_id=view.lift_id
+            lift_id=view.lift_id,
+            callback=self.suggestion_callback,
         )
-        self._consumer.register_message_callback(self.suggestion_callback)
         super().__init__(view=view)
 
     def start_handling_suggestions(self) -> None:
@@ -31,4 +31,5 @@ class RabbitMQSuggestionForwarder(SuggestionForwarder):
         self._consumer.stop()
 
     def suggestion_callback(self, ch, method, properties, body):
+        print('received suggestion')
         self._view.display_suggestion(Suggestion.from_json(body.decode('utf-8')))

@@ -2,7 +2,7 @@
 
 import os
 from threading import Thread
-from typing import List
+from typing import Callable, List
 
 import pika
 
@@ -124,12 +124,15 @@ def setup_sensor(lift_id: str, pika_producer:PikaProducer) -> None:
     Thread(target=generator.generate_continuous_data, daemon=True).start()
 
 
-def create_pika_consumer(exchange_name: str, exchange_type: str, lift_id: str) -> PikaConsumer:
+def create_pika_consumer(
+        exchange_name: str, exchange_type: str, lift_id: str, callback: Callable,
+    ) -> PikaConsumer:
     return PikaConsumer(
         exchange=exchange_name,
         exchange_type=exchange_type,
         route_key=lift_id,
         connection_parameters=create_pika_connection_parameters(),
+        callback=callback,
     )
 
 

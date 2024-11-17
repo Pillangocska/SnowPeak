@@ -23,8 +23,8 @@ class RabbitMQEmergencyStopHandler(RemoteEmergencyStopHandler):
             exchange_name='direct_emergency_stop',
             exchange_type='direct',
             lift_id=view.lift_id,
+            callback=self.emergency_stop_callback,
         )
-        self._consumer.register_message_callback(self.emergency_stop_callback)
         super().__init__(view=view)
 
     def start_handling_remote_emergency_stops(self) -> None:
