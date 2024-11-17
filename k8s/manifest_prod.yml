@@ -134,8 +134,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: frontend:latest
-          imagePullPolicy: Never
+          image: bambika/frontend:latest
           ports:
             - containerPort: 80
           env:
@@ -181,8 +180,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: backend-v1:latest
-          imagePullPolicy: Never
+          image: bambika/backend:latest
           ports:
             - containerPort: 8080
           env:
