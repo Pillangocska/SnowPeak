@@ -1,0 +1,703 @@
+################################# CONFIGMAPS #################################
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  RABBITMQ_HOST: rabbitmq
+  LIFT_1_ID: e93206d2-e357-4d2d-a43b-c194744dac9a
+  LIFT_1_START_LAT: 46.69539731050563
+  LIFT_1_START_LON: 13.914595364129971
+  LIFT_1_START_ELEVATION: 1200
+  LIFT_1_END_LAT: 46.693828878676364
+  LIFT_1_END_LON: 13.92304607372536
+  LIFT_1_END_ELEVATION: 2200
+  LIFT_1_ARRIVAL_RATE: 1000
+  LIFT_1_LINE_SPEED: 4
+  LIFT_1_CARRIER_CAPACITY: 4
+  LIFT_1_CARRIER_SPACING: 15
+  LIFT_1_CARRIERS_LOADING: 1
+  LIFT_1_MASTER_OPERATOR: b21f687b-02fc-4556-b2a4-17a9eb905033
+  LIFT_1_WORKER_OPERATORS: ea898911-a8ef-427d-9868-6b587ce91f3c,d7ef3579-d6a6-4e26-ac53-b423cbca2c60
+  LIFT_2_ID: 3e1d0733-76c5-44f9-b66c-91ed7a1fd24c
+  LIFT_2_START_LAT: 46.69739731050563
+  LIFT_2_START_LON: 13.914595364129971
+  LIFT_2_START_ELEVATION: 1200
+  LIFT_2_END_LAT: 46.693828878676364
+  LIFT_2_END_LON: 13.92304607372536
+  LIFT_2_END_ELEVATION: 2200
+  LIFT_2_ARRIVAL_RATE: 1000
+  LIFT_2_LINE_SPEED: 4
+  LIFT_2_CARRIER_CAPACITY: 4
+  LIFT_2_CARRIER_SPACING: 15
+  LIFT_2_CARRIERS_LOADING: 1
+  LIFT_2_MASTER_OPERATOR: b21f687b-02fc-4556-b2a4-17a9eb905033
+  LIFT_2_WORKER_OPERATORS: 09397786-7bd6-4615-93e5-55fe75528630,60886279-63d6-451d-b2a5-8ba3339152e4
+  LIFT_3_ID: 5b7129e2-66e2-46b8-a644-7f8f18c95dad
+  LIFT_3_START_LAT: 46.69539731050563
+  LIFT_3_START_LON: 13.914595364129971
+  LIFT_3_START_ELEVATION: 1200
+  LIFT_3_END_LAT: 46.693828878676364
+  LIFT_3_END_LON: 13.92304607372536
+  LIFT_3_END_ELEVATION: 2200
+  LIFT_3_ARRIVAL_RATE: 1000
+  LIFT_3_LINE_SPEED: 4
+  LIFT_3_CARRIER_CAPACITY: 4
+  LIFT_3_CARRIER_SPACING: 15
+  LIFT_3_CARRIERS_LOADING: 1
+  LIFT_3_MASTER_OPERATOR: b21f687b-02fc-4556-b2a4-17a9eb905033
+  LIFT_3_WORKER_OPERATORS: 09397786-7bd6-4615-93e5-55fe75528630,60886279-63d6-451d-b2a5-8ba3339152e4
+---
+################################# PVC-S #################################
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-logs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-postgres-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-postgres-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+################################# FRONTEND #################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 31080
+  selector:
+    app: frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              value: "http://backend:8080"
+            - name: RABBITMQ_WS_URL
+              value: "ws://rabbitmq:15674/ws"
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+---
+################################# BACKEND #################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: backend-v1:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "docker"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://db:5432/postgres"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "postgres"
+            - name: KEYCLOAK_AUTH_SERVER_URL
+              value: "http://keycloak:8080/auth"
+---
+################################# RABBIT MQ #################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  type: NodePort
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+    - name: management
+      port: 15672
+      targetPort: 15672
+      nodePort: 31672
+    - name: websocket
+      port: 15674
+      targetPort: 15674
+      nodePort: 31674
+  selector:
+    app: rabbitmq
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+            - containerPort: 15674
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: "guest"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "guest"
+          volumeMounts:
+            - name: rabbitmq-data
+              mountPath: /var/lib/rabbitmq
+            - name: rabbitmq-logs
+              mountPath: /var/log/rabbitmq
+            - name: rabbitmq-config
+              mountPath: /etc/rabbitmq/enabled_plugins
+              subPath: enabled_plugins
+      volumes:
+        - name: rabbitmq-data
+          persistentVolumeClaim:
+            claimName: rabbitmq-data-pvc
+        - name: rabbitmq-logs
+          persistentVolumeClaim:
+            claimName: rabbitmq-logs-pvc
+        - name: rabbitmq-config
+          configMap:
+            name: rabbitmq-plugins-config
+---
+################################# KEYCLOAK #################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 31090
+  selector:
+    app: keycloak
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:22.0.5
+          args: ["start-dev", "--import-realm"]
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+            - name: KC_FEATURES
+              value: "preview"
+            - name: KC_DB
+              value: "postgres"
+            - name: KC_DB_URL
+              value: "jdbc:postgresql://keycloak-postgres:5432/keycloak"
+            - name: KC_DB_USERNAME
+              value: "keycloak"
+            - name: KC_DB_PASSWORD
+              value: "password"
+          volumeMounts:
+            - name: keycloak-realms
+              mountPath: /opt/keycloak/data/import
+      volumes:
+        - name: keycloak-realms
+          configMap:
+            name: keycloak-realms-config
+---
+################################# Keycloak Postgres #################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-postgres
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: keycloak-postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak-postgres
+  template:
+    metadata:
+      labels:
+        app: keycloak-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "keycloak"
+            - name: POSTGRES_USER
+              value: "keycloak"
+            - name: POSTGRES_PASSWORD
+              value: "password"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data-pvc
+---
+################################# POSTGRES #################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14.1-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
+            - name: POSTGRES_DB
+              value: "postgres"
+          volumeMounts:
+            - name: app-postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: app-postgres-data
+          persistentVolumeClaim:
+            claimName: app-postgres-data-pvc
+---
+################################# SKI-LIFT #################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ski-lift-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ski-lift-1
+  template:
+    metadata:
+      labels:
+        app: ski-lift-1
+    spec:
+      containers:
+        - name: ski-lift
+          image: krisztianszenasi/ski-lift:latest
+          stdin: true
+          tty: true
+          env:
+            - name: LIFT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_ID
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_HOST
+            - name: START_LAT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_START_LAT
+            - name: START_LON
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_START_LON
+            - name: START_ELEVATION
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_START_ELEVATION
+            - name: END_LAT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_END_LAT
+            - name: END_LON
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_END_LON
+            - name: END_ELEVATION
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_END_ELEVATION
+            - name: ARRIVAL_RATE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_ARRIVAL_RATE
+            - name: LINE_SPEED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_LINE_SPEED
+            - name: CARRIER_CAPACITY
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_CARRIER_CAPACITY
+            - name: CARRIER_SPACING
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_CARRIER_SPACING
+            - name: CARRIERS_LOADING
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_CARRIERS_LOADING
+            - name: MASTER_OPERATOR
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_MASTER_OPERATOR
+            - name: WORKER_OPERATORS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_1_WORKER_OPERATORS
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ski-lift-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ski-lift-2
+  template:
+    metadata:
+      labels:
+        app: ski-lift-2
+    spec:
+      containers:
+        - name: ski-lift
+          image: krisztianszenasi/ski-lift:latest
+          stdin: true
+          tty: true
+          env:
+            - name: LIFT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_ID
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_HOST
+            - name: START_LAT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_START_LAT
+            - name: START_LON
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_START_LON
+            - name: START_ELEVATION
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_START_ELEVATION
+            - name: END_LAT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_END_LAT
+            - name: END_LON
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_END_LON
+            - name: END_ELEVATION
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_END_ELEVATION
+            - name: ARRIVAL_RATE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_ARRIVAL_RATE
+            - name: LINE_SPEED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_LINE_SPEED
+            - name: CARRIER_CAPACITY
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_CARRIER_CAPACITY
+            - name: CARRIER_SPACING
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_CARRIER_SPACING
+            - name: CARRIERS_LOADING
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_CARRIERS_LOADING
+            - name: MASTER_OPERATOR
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_MASTER_OPERATOR
+            - name: WORKER_OPERATORS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_2_WORKER_OPERATORS
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ski-lift-3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ski-lift-3
+  template:
+    metadata:
+      labels:
+        app: ski-lift-3
+    spec:
+      containers:
+        - name: ski-lift
+          image: krisztianszenasi/ski-lift:latest
+          stdin: true
+          tty: true
+          env:
+            - name: LIFT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_ID
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RABBITMQ_HOST
+            - name: START_LAT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_START_LAT
+            - name: START_LON
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_START_LON
+            - name: START_ELEVATION
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_START_ELEVATION
+            - name: END_LAT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_END_LAT
+            - name: END_LON
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_END_LON
+            - name: END_ELEVATION
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_END_ELEVATION
+            - name: ARRIVAL_RATE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_ARRIVAL_RATE
+            - name: LINE_SPEED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_LINE_SPEED
+            - name: CARRIER_CAPACITY
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_CARRIER_CAPACITY
+            - name: CARRIER_SPACING
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_CARRIER_SPACING
+            - name: CARRIERS_LOADING
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_CARRIERS_LOADING
+            - name: MASTER_OPERATOR
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_MASTER_OPERATOR
+            - name: WORKER_OPERATORS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LIFT_3_WORKER_OPERATORS
