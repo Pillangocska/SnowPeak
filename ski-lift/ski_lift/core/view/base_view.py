@@ -4,9 +4,6 @@ from abc import abstractmethod
 from typing import Optional
 
 from ski_lift.core.command.command_panel import CommandPanel
-from ski_lift.core.command.descriptor.factory import CommandDescriptorFactory
-from ski_lift.core.command.descriptor.object import \
-    ChangeStateCommandDescriptor
 from ski_lift.core.controller import Controller
 from ski_lift.core.monitor.result.result_monitor import CommandResultMonitor
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
@@ -40,8 +37,16 @@ class BaseView(CommandPanel, CommandResultMonitor):
 
     @abstractmethod
     def start_handling_user_inputs(self) -> None:
-        pass
+        """Start handling user inputs.
+
+        This function is responsible for starting the process of handling user
+        inputs. It typically blocks the main thread.
+        """
 
     @abstractmethod
     def display_suggestion(self, suggestion: Suggestion) -> None:
-        pass
+        """Display suggestion.
+        
+        This function is responsible for displaying a suggestion on the user
+        interface.
+        """

@@ -3,6 +3,7 @@
 import functools
 import logging
 import time
+from ast import Call
 from threading import Event, Thread
 from typing import Callable
 
@@ -35,6 +36,7 @@ class ExampleConsumer(object):
         exchange_type: ExchangeType,
         route_key: str,
         connection_parameters: ConnectionParameters,
+        callback: callable,
     ):
         self._exchange = exchange
         self._exchange_type = exchange_type
@@ -52,11 +54,8 @@ class ExampleConsumer(object):
         # In production, experiment with higher prefetch values
         # for higher consumer throughput
         self._prefetch_count = 1
-        self._on_message_callbacks = []
+        self._callback: Callable = callback
         self._queue: str = None
-
-    def register_message_callback(self, callback: Callable):
-        self._on_message_callbacks.append(callback)
 
     def connect(self):
         """This method connects to RabbitMQ, returning the connection handle.
@@ -273,8 +272,7 @@ class ExampleConsumer(object):
         """
         LOGGER.info('Issuing consumer related RPC commands')
         self.add_on_cancel_callback()
-        self._consumer_tag = self._channel.basic_consume(
-            self._queue, self.on_message)
+        self._consumer_tag = self._channel.basic_consume(self._queue, self.on_message)
         self.was_consuming = True
         self._consuming = True
 
@@ -312,8 +310,7 @@ class ExampleConsumer(object):
         :param bytes body: The message body
 
         """
-        for callback in self._on_message_callbacks:
-            callback(channel, basic_deliver, properties, body)
+        self._callback(channel, basic_deliver, properties, body)
         self.acknowledge_message(basic_deliver.delivery_tag)
 
     def acknowledge_message(self, delivery_tag):
@@ -385,7 +382,7 @@ class ExampleConsumer(object):
             LOGGER.info('Stopping')
             if self._consuming:
                 self.stop_consuming()
-            else:
+            elif self._connection is not None:
                 self._connection.ioloop.stop()
             LOGGER.info('Stopped')
 
@@ -402,6 +399,7 @@ class PikaConsumer(object):
         exchange_type: ExchangeType,
         route_key: str,
         connection_parameters: ConnectionParameters,
+        callback: Callable,
     ):
         self._reconnect_delay = 0
     
@@ -409,13 +407,11 @@ class PikaConsumer(object):
         self._exchange_type = exchange_type
         self._route_key = route_key
         self._connection_parameters = connection_parameters
+        self._callback = callback
 
-        self._consumer = ExampleConsumer(exchange, exchange_type, route_key, connection_parameters)
+        self._consumer = ExampleConsumer(exchange, exchange_type, route_key, connection_parameters, callback)
         self._thread = None
         self._stop_event = None
-
-    def register_message_callback(self, callback: Callable):
-        self._consumer.register_message_callback(callback)
 
     def start(self):
         if self._thread is None:
@@ -445,7 +441,8 @@ class PikaConsumer(object):
             LOGGER.info('Reconnecting after %d seconds', reconnect_delay)
             time.sleep(reconnect_delay)
             self._consumer = ExampleConsumer(
-                self._exchange, self._exchange_type, self._route_key, self._connection_parameters)
+                self._exchange, self._exchange_type, self._route_key, self._connection_parameters, self._callback
+            )
 
     def _get_reconnect_delay(self):
         if self._consumer.was_consuming:

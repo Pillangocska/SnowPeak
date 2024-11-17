@@ -1,34 +1,30 @@
 """RabbitMQ based emergency stop handler."""
 
-from ski_lift.core.remote.emergency_stop.base import RemoteEmergencyStopHandler
-from ski_lift.core.controller import Controller
-import os
-from ski_lift.core.remote.rabbitmq.pika_consumer import PikaConsumer
-import pika 
 import json
-from camel_converter import dict_to_snake
-from ski_lift.core.remote.suggestion.suggestion import Suggestion
 from datetime import datetime
-from ski_lift.core.view import BaseView
+from typing import TYPE_CHECKING
+
+from camel_converter import dict_to_snake
+
+from ski_lift.core.remote.emergency_stop.base import RemoteEmergencyStopHandler
+from ski_lift.core.remote.suggestion.suggestion import Suggestion
+
+if TYPE_CHECKING:
+    from ski_lift.core.remote.rabbitmq.pika_consumer import PikaConsumer
+    from ski_lift.core.view import BaseView
 
 
 class RabbitMQEmergencyStopHandler(RemoteEmergencyStopHandler):
 
-    def __init__(self, view: BaseView) -> None:
-        self._consumer: PikaConsumer = PikaConsumer(
-            exchange='direct_emergency_stop',
+    def __init__(self, view: 'BaseView') -> None:
+        # todo: refactor code to prevent circular import 
+        from ski_lift.use_cases import create_pika_consumer
+        self._consumer: 'PikaConsumer' = create_pika_consumer(
+            exchange_name='direct_emergency_stop',
             exchange_type='direct',
-            route_key=view.lift_id,
-            connection_parameters=pika.ConnectionParameters(
-                host=os.environ.get('RABBITMQ_HOST', 'localhost'),
-                port=int(os.environ.get('RABBITMQ_PORT', 5672)),
-                credentials=pika.PlainCredentials(
-                    username=os.environ.get('RABBITMQ_USER', 'guest'),
-                    password=os.environ.get('RABBITMQ_PASSWORD', 'guest'),
-                )
-            )
+            lift_id=view.lift_id,
+            callback=self.emergency_stop_callback,
         )
-        self._consumer.register_message_callback(self.emergency_stop_callback)
         super().__init__(view=view)
 
     def start_handling_remote_emergency_stops(self) -> None:

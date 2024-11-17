@@ -1,10 +1,12 @@
 """RabbitMQ communicator."""
 
-from ...command.descriptor.object import MessageReportCommandDescriptor
-from ski_lift.core.remote.communicator.base import RemoteCommunicator
-from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
 import json
 from datetime import datetime
+
+from ski_lift.core.remote.communicator.base import RemoteCommunicator
+from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
+
+from ...command.descriptor.object import MessageReportCommandDescriptor
 
 
 class RabbitMQCommunicator(RemoteCommunicator):

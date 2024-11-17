@@ -13,7 +13,8 @@ from typing import TYPE_CHECKING, Optional
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
     DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
-    InsertCardCommandDescriptor, MessageReportCommandDescriptor, RemoveCardCommandDescriptor)
+    InsertCardCommandDescriptor, MessageReportCommandDescriptor,
+    RemoveCardCommandDescriptor)
 from ski_lift.core.engine import EngineState
 
 if TYPE_CHECKING:
