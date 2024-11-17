@@ -10,22 +10,12 @@ services:
     ports:
       - ${ANGULAR_PORT}:${ANGULAR_PORT}
     environment:
-      - BACKEND_URL=http://backend:${SPRING_BOOT_PORT}
-      - RABBITMQ_WS_URL=ws://rabbitmq:${RABBITMQ_WEBSOCKET_PORT}/ws
+      BACKEND_URL: ${BACKEND_URL}
+      RABBITMQ_WS_URL: ${RABBITMQ_WS_URL}
     volumes:
       - ./client/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - backend
-    networks:
-      - frontend-network
-      - backend-network
-      - keycloak-network
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
 
   backend:
     image: backend
@@ -38,15 +28,15 @@ services:
     ports:
       - ${SPRING_BOOT_PORT}:${SPRING_BOOT_PORT}
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_PORT=5672
-      - SPRING_RABBITMQ_USERNAME=guest
-      - SPRING_RABBITMQ_PASSWORD=guest
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      KEYCLOAK_AUTH_SERVER_URL: ${KEYCLOAK_AUTH_SERVER_URL}
+      SPRING_RABBITMQ_HOST: ${RABBITMQ_HOST}
+      SPRING_RABBITMQ_PORT: ${RABBITMQ_AMQP_PORT}
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     env_file:
       - .env
     volumes:
@@ -58,10 +48,6 @@ services:
         condition: service_started
       keycloak:
         condition: service_started
-    networks:
-      - frontend-network
-      - backend-network
-      - keycloak-network
 
   ski-lift-1:
     image: krisztianszenasi/ski-lift:latest
@@ -70,7 +56,7 @@ services:
     tty: true
     environment:
       LIFT_ID: ${LIFT_1_ID}
-      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
       START_LAT: ${LIFT_1_START_LAT}
       START_LON: ${LIFT_1_START_LON}
       START_ELEVATION: ${LIFT_1_START_ELEVATION}
@@ -84,8 +70,6 @@ services:
       CARRIERS_LOADING: ${LIFT_1_CARRIERS_LOADING}
       MASTER_OPERATOR: ${LIFT_1_MASTER_OPERATOR}
       WORKER_OPERATORS: ${LIFT_1_WORKER_OPERATORS}
-    networks:
-      - backend-network
     depends_on:
       - rabbitmq
 
@@ -96,9 +80,20 @@ services:
     tty: true
     environment:
       LIFT_ID: ${LIFT_2_ID}
-      RABBITMQ_HOST: rabbitmq
-    networks:
-      - backend-network
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      START_LAT: ${LIFT_2_START_LAT}
+      START_LON: ${LIFT_2_START_LON}
+      START_ELEVATION: ${LIFT_2_START_ELEVATION}
+      END_LAT: ${LIFT_2_END_LAT}
+      END_LON: ${LIFT_2_END_LON}
+      END_ELEVATION: ${LIFT_2_END_ELEVATION}
+      ARRIVAL_RATE: ${LIFT_2_ARRIVAL_RATE}
+      LINE_SPEED: ${LIFT_2_LINE_SPEED}
+      CARRIER_CAPACITY: ${LIFT_2_CARRIER_CAPACITY}
+      CARRIER_SPACING: ${LIFT_2_CARRIER_SPACING}
+      CARRIERS_LOADING: ${LIFT_2_CARRIERS_LOADING}
+      MASTER_OPERATOR: ${LIFT_2_MASTER_OPERATOR}
+      WORKER_OPERATORS: ${LIFT_2_WORKER_OPERATORS}
     depends_on:
       - rabbitmq
 
@@ -109,9 +104,20 @@ services:
     tty: true
     environment:
       LIFT_ID: ${LIFT_3_ID}
-      RABBITMQ_HOST: rabbitmq
-    networks:
-      - backend-network
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      START_LAT: ${LIFT_3_START_LAT}
+      START_LON: ${LIFT_3_START_LON}
+      START_ELEVATION: ${LIFT_3_START_ELEVATION}
+      END_LAT: ${LIFT_3_END_LAT}
+      END_LON: ${LIFT_3_END_LON}
+      END_ELEVATION: ${LIFT_3_END_ELEVATION}
+      ARRIVAL_RATE: ${LIFT_3_ARRIVAL_RATE}
+      LINE_SPEED: ${LIFT_3_LINE_SPEED}
+      CARRIER_CAPACITY: ${LIFT_3_CARRIER_CAPACITY}
+      CARRIER_SPACING: ${LIFT_3_CARRIER_SPACING}
+      CARRIERS_LOADING: ${LIFT_3_CARRIERS_LOADING}
+      MASTER_OPERATOR: ${LIFT_3_MASTER_OPERATOR}
+      WORKER_OPERATORS: ${LIFT_3_WORKER_OPERATORS}
     depends_on:
       - rabbitmq
 
@@ -128,10 +134,8 @@ services:
       - "${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}"
       - "${RABBITMQ_WEBSOCKET_PORT}:${RABBITMQ_WEBSOCKET_PORT}"
     environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-guest}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-guest}
-    networks:
-      - backend-network
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     labels:
       kompose.service.type: ClusterIP
     healthcheck:
@@ -139,13 +143,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 256M
-
 
   keycloak:
     build: .
@@ -153,16 +150,14 @@ services:
     ports:
       - ${KEYCLOAK_EXTERNAL_PORT}:${KEYCLOAK_INTERNAL_PORT}
     environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://keycloak-postgres:5432/keycloak
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: password
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: ${KC_DB}
+      KC_DB_URL: ${KC_DB_URL}
+      KC_DB_USERNAME: ${KEYCLOAK_POSTGRES_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_POSTGRES_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
     depends_on:
       - keycloak-postgres
-    networks:
-      - keycloak-network
 
   keycloak-postgres:
     container_name: keycloak-postgres
@@ -175,23 +170,19 @@ services:
       POSTGRES_PASSWORD: ${KEYCLOAK_POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - keycloak-network
 
   db:
     image: postgres:14.1-alpine
     container_name: db
     restart: always
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - '${POSTGRES_EXTERNAL_PORT}:${POSTGRES_PORT}'
     volumes:
       - app_postgres_data:/var/lib/postgresql/data
-    networks:
-      - backend-network
 
 volumes:
   rabbitmq_data:
@@ -200,11 +191,3 @@ volumes:
     driver: local
   app_postgres_data:
     driver: local
-
-networks:
-  frontend-network:
-    driver: bridge
-  backend-network:
-    driver: bridge
-  keycloak-network:
-    driver: bridge
