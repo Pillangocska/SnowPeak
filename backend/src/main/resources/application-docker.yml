@@ -58,7 +58,7 @@ spring:
 
 rabbitmq:
   exchange:
-    name: topic_skilift
+    name: direct_suggestions
 
 keycloak:
   realm: snow-peak

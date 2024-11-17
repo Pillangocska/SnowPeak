@@ -9,7 +9,6 @@ import java.util.UUID;
 public class LogResponseModel {
     private UUID id;
     private UUID liftId;
-    private String queueName;
     private String payload;
     private LocalDateTime time;
 }

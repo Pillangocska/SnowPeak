@@ -1,5 +1,5 @@
-drop table if exists lift;
 drop table if exists log;
+drop table if exists lift;
 
 create table lift(
     lift_id                uuid          not null primary key,
@@ -17,7 +17,6 @@ create table lift(
 create table log(
     log_id          uuid            not null primary key,
     log_lift_id     uuid            not null,
-    log_queue_name  text            not null,
     log_payload     json            not null,
     log_time        timestamp       not null,
 
