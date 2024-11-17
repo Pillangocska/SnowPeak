@@ -51,17 +51,17 @@ def create_controller(lift_id: str, producer: PikaProducer) -> Controller:
 
 def create_erlang_c_model() -> ErlangCModel:
     return ErlangCModel(
-        start_lat=os.environ.get('START_LAT', 45.5),
-        start_lon=os.environ.get('START_LON', 73.5),
-        start_elevation=os.environ.get('START_ELEVATION', 1200),
-        end_lat=os.environ.get('END_LAT', 45.52),
-        end_lon=os.environ.get('END_LON', 73.48),
-        end_elevation=os.environ.get('END_ELEVATION', 2200),
-        arrival_rate=os.environ.get('ARRIVAL_RATE', 1000),          
-        line_speed=os.environ.get('LINE_SPEED', 4),
-        carrier_capacity=os.environ.get('CARRIER_CAPACITY', 4),
-        carrier_spacing=os.environ.get('CARRIER_SPACING', 15),
-        carriers_loading=os.environ.get('CARRIERS_LOADING', 1),
+        start_lat=float(os.environ.get('START_LAT', 45.5)),
+        start_lon=float(os.environ.get('START_LON', 73.5)),
+        start_elevation=float(os.environ.get('START_ELEVATION', 1200)),
+        end_lat=float(os.environ.get('END_LAT', 45.52)),
+        end_lon=float(os.environ.get('END_LON', 73.48)),
+        end_elevation=float(os.environ.get('END_ELEVATION', 2200)),
+        arrival_rate=float(os.environ.get('ARRIVAL_RATE', 1000)),          
+        line_speed=float(os.environ.get('LINE_SPEED', 4)),
+        carrier_capacity=float(os.environ.get('CARRIER_CAPACITY', 4)),
+        carrier_spacing=float(os.environ.get('CARRIER_SPACING', 15)),
+        carriers_loading=float(os.environ.get('CARRIERS_LOADING', 1)),
     )
 
 
