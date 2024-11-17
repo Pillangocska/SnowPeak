@@ -19,6 +19,7 @@ services:
     networks:
       - frontend-network
       - backend-network
+      - keycloak-network
     deploy:
       resources:
         limits:
@@ -158,9 +159,6 @@ services:
       KC_DB_PASSWORD: password
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-    command: 
-      - start-dev
-      - --import-realm
     depends_on:
       - keycloak-postgres
     networks:
