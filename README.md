@@ -62,3 +62,73 @@ This project is licensed under the Apache License - see the [LICENSE](LICENSE) f
 ---
 
 © 2024 SnowPeak Team. All rights reserved.
+
+legjobb:
+{
+    "realm": "docker-realm",
+    "enabled": true,
+    "displayName": "Docker Development Realm",
+    "sslRequired": "external",
+    "registrationAllowed": true,
+    "attributes": {
+      "frontendUrl": "http://frontend:80"
+    },
+    "roles": {
+      "realm": [
+        {
+          "name": "operator",
+          "description": "Regular operator role"
+        }
+      ],
+      "client": {
+        "docker-frontend": [
+          {
+            "name": "operator",
+            "description": "Regular operator role"
+          }
+        ]
+      }
+    },
+    "users": [
+      {
+        "username": "test-operator",
+        "enabled": true,
+        "emailVerified": true,
+        "firstName": "Test",
+        "lastName": "Operator",
+        "email": "testoperator@example.com",
+        "credentials": [
+          {
+            "type": "password",
+            "value": "test-operator",
+            "temporary": false
+          }
+        ],
+        "realmRoles": ["operator"],
+        "clientRoles": {
+          "docker-frontend": ["operator"]
+        },
+        "attributes": {
+          "locale": ["en"]
+        }
+      }
+    ],
+    "clients": [
+      {
+        "clientId": "docker-frontend",
+        "enabled": true,
+        "publicClient": true,
+        "redirectUris": [
+        "http://localhost/*",
+        "http://localhost/operator/*",
+        "http://frontend/*",
+        "http://frontend/operator/*",
+        "http://frontend:80/*",
+        "http://frontend:80/operator/*"
+      ],
+        "webOrigins": ["*"],
+        "rootUrl": "http://frontend:80",
+        "adminUrl": "http://frontend:80"
+      }
+    ]
+  }
