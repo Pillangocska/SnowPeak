@@ -1,5 +1,5 @@
-drop table if exists lift;
 drop table if exists log;
+drop table if exists lift;
 
 create table lift(
     lift_id                uuid          not null primary key,

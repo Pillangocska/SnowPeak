@@ -40,9 +40,10 @@ public class RabbitMQProducer {
     }
 
     public void sendSuggestion(String suggestionMessage, String liftId) {
+        System.out.println("Lift ID: " + liftId);
         rabbitTemplate.convertAndSend(
                 SUGGESTION_EXCHANGE,
-                liftId, // Using liftId as routing key
+                liftId,
                 suggestionMessage
         );
     }

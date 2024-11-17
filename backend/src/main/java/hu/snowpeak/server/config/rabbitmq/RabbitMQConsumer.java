@@ -126,7 +126,6 @@ public class RabbitMQConsumer {
         if (routingKey == null || !routingKey.startsWith("skilift.")) {
             return null;
         }
-        // Assume routing key format is "skilift.<lift_id>.logs..."
         String[] parts = routingKey.split("\\.");
         return parts.length > 1 ? parts[1] : null;
     }
