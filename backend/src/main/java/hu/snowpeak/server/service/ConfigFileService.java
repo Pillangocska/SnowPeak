@@ -6,6 +6,7 @@ import hu.snowpeak.server.mapper.LiftMapper;
 import hu.snowpeak.server.model.LiftConfigModel;
 import hu.snowpeak.server.repository.LiftRepository;
 import hu.snowpeak.server.util.EnvFileParser;
+import hu.snowpeak.server.util.enums.LiftStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,8 @@ public class ConfigFileService {
 
             config.setWorkerOperators(new HashSet<>(workerOperatorsList));
 
+            config.setStatus(LiftStatus.PUBLIC);
+
             Lift liftToSave = liftMapper.fromConfigToEntity(config);
 
             liftRepository.save(liftToSave);
@@ -103,8 +106,6 @@ public class ConfigFileService {
 
     public void processConfigDirectory(String directoryPath) throws IOException {
         try (Stream<Path> paths = Files.walk(Paths.get(directoryPath))) {
-            //liftRepository.deleteAll();
-
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".env"))
                     .forEach(path -> {

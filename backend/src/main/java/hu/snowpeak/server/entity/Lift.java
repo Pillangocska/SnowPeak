@@ -1,5 +1,6 @@
 package hu.snowpeak.server.entity;
 
+import hu.snowpeak.server.util.enums.LiftStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,10 @@ public class Lift extends AbstractBaseEntity {
 
     @Column(name = "lift_master_operator_id")
     private UUID masterOperatorId;
+
+    @Column(name = "lift_status")
+    @Enumerated(EnumType.STRING)
+    private LiftStatus status;
 
     @ElementCollection
     @CollectionTable(name = "worker",

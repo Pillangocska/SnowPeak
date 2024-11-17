@@ -1,5 +1,6 @@
 package hu.snowpeak.server.model;
 
+import hu.snowpeak.server.util.enums.LiftStatus;
 import lombok.Data;
 
 import java.util.Set;
@@ -21,6 +22,8 @@ public class LiftConfigModel {
     private Integer carrierCapacity;
     private Integer carrierSpacing;
     private Integer carriersLoading;
+
+    private LiftStatus status;
 
     private UUID masterOperator;
     private Set<UUID> workerOperators;

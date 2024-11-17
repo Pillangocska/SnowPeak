@@ -29,19 +29,6 @@ spring:
             naming:
                 physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         database-platform: org.hibernate.dialect.PostgreSQLDialect
-    security:
-        oauth2:
-            resourceserver:
-                jwt:
-                    issuer-uri: http://localhost:9090/realms/snow-peak
-
-keycloak:
-    realm: snow-peak
-    resource: snow-peak
-    auth-server-url: http://localhost:9090/auth
-    ssl-required: external
-    public-client: true
-    use-resource-role-mappings: true
 
 springdoc:
     enable-native-support: true
