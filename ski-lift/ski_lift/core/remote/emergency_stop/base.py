@@ -1,12 +1,15 @@
 """Remote emergency stop handler."""
 
 from abc import abstractmethod
-from ski_lift.core.view.base_view import BaseView
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ski_lift.core.view.base_view import BaseView
 
 
 class RemoteEmergencyStopHandler(object):
 
-    def __init__(self, view: BaseView) -> None:
+    def __init__(self, view: 'BaseView') -> None:
         self._view: BaseView = view
 
     def __enter__(self):

@@ -1,7 +1,7 @@
 """Command file monitor."""
 
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ski_lift.core.command.descriptor.object import CommandDescriptor
 from ski_lift.core.command.descriptor.serializer.base import \
@@ -11,8 +11,6 @@ from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from ski_lift.core.monitor.descriptor.descriptor_monitor import \
     CommandDescriptorMonitor
 from ski_lift.core.monitor.result.result_monitor import CommandResultMonitor
-from typing import TYPE_CHECKING
-
 
 if TYPE_CHECKING:
     from ski_lift.core.controller import Controller

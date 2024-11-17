@@ -1,16 +1,16 @@
 """Controller implementation."""
 
-from ski_lift.core.auth import CommandAuthorizable, BaseAuthorizer
+from ski_lift.core.auth import BaseAuthorizer, CommandAuthorizable
 from ski_lift.core.command.descriptor.executor.delayed import \
     DelayedCommandExecutor
 from ski_lift.core.engine import Engine, EngineState
-from ski_lift.core.monitor.descriptor.descriptor_monitor import (CommandDescriptorMonitorSource)
-from ski_lift.core.monitor.result.result_monitor import (CommandResultMonitorSource)
+from ski_lift.core.math.erlang_c import ErlangCModel
+from ski_lift.core.monitor.descriptor.descriptor_monitor import \
+    CommandDescriptorMonitorSource
+from ski_lift.core.monitor.result.result_monitor import \
+    CommandResultMonitorSource
 from ski_lift.core.remote.communicator import RemoteCommunicator
 
-from ski_lift.core.math.erlang_c import ErlangCModel
-
-from ski_lift.core.math.erlang_c import ErlangCModel
 
 class Controller(
     DelayedCommandExecutor, CommandAuthorizable, CommandResultMonitorSource, CommandDescriptorMonitorSource

@@ -1,12 +1,12 @@
 """Remote communicator implementation."""
 
 from abc import ABC, abstractmethod
-from threading import Thread, Event
-
-from ski_lift.core.command.descriptor.object import MessageReportCommandDescriptor
+from threading import Event, Thread
 from time import sleep
-
 from typing import TYPE_CHECKING
+
+from ski_lift.core.command.descriptor.object import \
+    MessageReportCommandDescriptor
 
 if TYPE_CHECKING:
     from ski_lift.core.controller import Controller

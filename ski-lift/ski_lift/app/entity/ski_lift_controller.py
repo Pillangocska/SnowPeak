@@ -1,7 +1,5 @@
 """Controller implementation."""
 
-from ...core.command.descriptor.object import MessageReportCommandDescriptor
-from ...core.command.result.object import MessageReportCommandResult
 from ski_lift.core.auth.authorizer.base_authorizer import (BaseAuthorizer,
                                                            send_through_auth)
 from ski_lift.core.command.descriptor.object import (
@@ -20,7 +18,11 @@ from ski_lift.core.engine import Engine
 from ski_lift.core.monitor.descriptor.descriptor_monitor import \
     monitor_descriptor
 from ski_lift.core.monitor.result.result_monitor import monitor_result
-from  ski_lift.core.remote.communicator import RemoteCommunicator
+from ski_lift.core.remote.communicator import RemoteCommunicator
+
+from ...core.command.descriptor.object import MessageReportCommandDescriptor
+from ...core.command.result.object import MessageReportCommandResult
+
 
 class SkiLiftController(Controller):
 

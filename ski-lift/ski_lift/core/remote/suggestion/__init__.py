@@ -1,0 +1,1 @@
+from .rabbit_mq_suggestion_forwarder import RabbitMQSuggestionForwarder

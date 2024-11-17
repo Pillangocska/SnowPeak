@@ -1,38 +1,59 @@
 """Ski lift use cases."""
 
 import os
-from typing import List
+from threading import Thread
+from typing import Callable, List
+
+import pika
 
 from ski_lift.app.entity import SkiLiftAuthorizer, SkiLiftController
 from ski_lift.core.auth import BaseAuthenticator, InMemoryAuthenticator
+from ski_lift.core.command.descriptor.serializer import (
+    JSONBytesDescriptorSerializer, PrettyStringDescriptorSerializer)
+from ski_lift.core.command.result.serializer import (
+    JSONBytesResultSerializer, PrettyResultStringSerializer)
 from ski_lift.core.controller import Controller
 from ski_lift.core.engine import Engine
-from ski_lift.core.remote import PikaProducer
-import pika
-from ski_lift.core.sensor import RabbitMQObserver, SensorDataGenerator
-from threading import Thread
-from ski_lift.core.monitor.logger import FileCommandLogger, RabbitMQCommandLogger
-from ski_lift.core.command.descriptor.serializer import PrettyStringDescriptorSerializer, JSONBytesDescriptorSerializer
-from ski_lift.core.command.result.serializer import PrettyResultStringSerializer, JSONBytesResultSerializer
-from ski_lift.core.remote.communicator.rabbit_mq import RabbitMQCommunicator
 from ski_lift.core.math.erlang_c import ErlangCModel
+from ski_lift.core.monitor.logger import (FileCommandLogger,
+                                          RabbitMQCommandLogger)
+from ski_lift.core.remote import (PikaConsumer, PikaProducer,
+                                  RabbitMQCommunicator)
+from ski_lift.core.sensor import RabbitMQObserver, SensorDataGenerator
 
 
-def attach_loggers_to(controller: Controller, producer: PikaProducer):
+def attach_loggers_to(controller: Controller, producer: PikaProducer) -> None:
+    """Attach loggers to the controller.
+
+    Args:
+        controller (Controller): controller to attach to
+        producer (PikaProducer): producer that is used by some loggers
+    """
     attach_file_logger_to(controller)
-    attach_rabbit_mq_logger_to(controller, controller.lift_id, producer)
+    attach_rabbit_mq_logger_to(controller, producer)
 
 
 def attach_file_logger_to(controller: Controller):
+    """Attach a file logger to the given controller.
+
+    Args:
+        controller (Controller): controller to attach to.
+    """
     command_logger = FileCommandLogger(PrettyStringDescriptorSerializer(), PrettyResultStringSerializer())
     command_logger.attach_to(controller)
 
-def attach_rabbit_mq_logger_to(controller: Controller, lift_id: str, producer: PikaProducer):
+def attach_rabbit_mq_logger_to(controller: Controller, producer: PikaProducer):
+    """Attach a rabbit mq based command logger to the given controller.
+
+    Args:
+        controller (Controller): controller to attach to.
+        producer (PikaProducer): _description_
+    """
     rabbit_logger = RabbitMQCommandLogger(
         descriptor_serializer=JSONBytesDescriptorSerializer(),
         result_serializer=JSONBytesResultSerializer(),
         pika_producer=producer,
-        lift_id=lift_id,
+        lift_id=controller.lift_id,
     )
     rabbit_logger.attach_to(controller)
 
@@ -51,17 +72,17 @@ def create_controller(lift_id: str, producer: PikaProducer) -> Controller:
 
 def create_erlang_c_model() -> ErlangCModel:
     return ErlangCModel(
-        start_lat=os.environ.get('START_LAT', 45.5),
-        start_lon=os.environ.get('START_LON', 73.5),
-        start_elevation=os.environ.get('START_ELEVATION', 1200),
-        end_lat=os.environ.get('END_LAT', 45.52),
-        end_lon=os.environ.get('END_LON', 73.48),
-        end_elevation=os.environ.get('END_ELEVATION', 2200),
-        arrival_rate=os.environ.get('ARRIVAL_RATE', 1000),          
-        line_speed=os.environ.get('LINE_SPEED', 4),
-        carrier_capacity=os.environ.get('CARRIER_CAPACITY', 4),
-        carrier_spacing=os.environ.get('CARRIER_SPACING', 15),
-        carriers_loading=os.environ.get('CARRIERS_LOADING', 1),
+        start_lat=float(os.environ.get('START_LAT', 45.5)),
+        start_lon=float(os.environ.get('START_LON', 73.5)),
+        start_elevation=float(os.environ.get('START_ELEVATION', 1200)),
+        end_lat=float(os.environ.get('END_LAT', 45.52)),
+        end_lon=float(os.environ.get('END_LON', 73.48)),
+        end_elevation=float(os.environ.get('END_ELEVATION', 2200)),
+        arrival_rate=float(os.environ.get('ARRIVAL_RATE', 1000)),          
+        line_speed=float(os.environ.get('LINE_SPEED', 4)),
+        carrier_capacity=float(os.environ.get('CARRIER_CAPACITY', 4)),
+        carrier_spacing=float(os.environ.get('CARRIER_SPACING', 15)),
+        carriers_loading=float(os.environ.get('CARRIERS_LOADING', 1)),
     )
 
 
@@ -82,22 +103,14 @@ def create_pika_producer() -> PikaProducer:
     Returns:
         PikaProducer: dedicated pika producer
     """
-    pika_producer = PikaProducer(
+    return PikaProducer(
         exchange='topic_skilift',
         exchange_type='topic',
-        connection_parameters=pika.ConnectionParameters(
-            host=os.environ.get('RABBITMQ_HOST', 'localhost'),
-            port=int(os.environ.get('RABBITMQ_PORT', 5672)),
-            credentials=pika.PlainCredentials(
-                username=os.environ.get('RABBITMQ_USER', 'guest'),
-                password=os.environ.get('RABBITMQ_PASSWORD', 'guest'),
-            )
-        )
+        connection_parameters=create_pika_connection_parameters(),
     )
-    return pika_producer
 
 
-def setup_sensor(lift_id: str, pika_producer: PikaProducer) -> None:
+def setup_sensor(lift_id: str, pika_producer:PikaProducer) -> None:
     """Setup sensor."""
     sensor_config = {
         'base_temperature': {'mean_temp': -5, 'amplitude': 3},
@@ -110,3 +123,26 @@ def setup_sensor(lift_id: str, pika_producer: PikaProducer) -> None:
     for sensor in generator.sensors.values():
         sensor.attach(observer)
     Thread(target=generator.generate_continuous_data, daemon=True).start()
+
+
+def create_pika_consumer(
+        exchange_name: str, exchange_type: str, lift_id: str, callback: Callable,
+    ) -> PikaConsumer:
+    return PikaConsumer(
+        exchange=exchange_name,
+        exchange_type=exchange_type,
+        route_key=lift_id,
+        connection_parameters=create_pika_connection_parameters(),
+        callback=callback,
+    )
+
+
+def create_pika_connection_parameters() -> pika.ConnectionParameters:
+    return pika.ConnectionParameters(
+        host=os.environ.get('RABBITMQ_HOST', 'localhost'),
+        port=int(os.environ.get('RABBITMQ_PORT', 5672)),
+        credentials=pika.PlainCredentials(
+            username=os.environ.get('RABBITMQ_USER', 'guest'),
+            password=os.environ.get('RABBITMQ_PASSWORD', 'guest'),
+        ),
+    )
