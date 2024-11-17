@@ -15,4 +15,10 @@ export class RabbitmqService {
       `${this.baseExchangeUrl}skilift.${liftId}.logs.sensor.*`,
     );
   }
+
+  watchPublicLiftsMessages(): Observable<any> {
+    return this.rxStompService.watch(
+      `${this.baseExchangeUrl}skilift.*.logs.status_update`,
+    );
+  }
 }

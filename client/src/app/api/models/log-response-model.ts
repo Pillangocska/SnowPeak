@@ -6,6 +6,5 @@ export interface LogResponseModel {
   id?: string;
   liftId?: string;
   payload?: string;
-  queueName?: string;
   time?: string;
 }

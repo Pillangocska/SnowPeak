@@ -61,14 +61,10 @@ export class OperatorComponent implements OnInit {
   ngOnInit(): void {
     this.keycloakService.getToken().then((val) => console.log(val));
 
-    this.rxStompService
-      .watch('/exchange/broadcast-exchange')
-      .subscribe((message) => {
-        console.log('Received message:', message);
-      });
-
     this.liftService
-      .getPrivateLifts()
+      .getPrivateLiftsByOperatorId({
+        operatorId: 'b21f687b-02fc-4556-b2a4-17a9eb905033',
+      })
       .subscribe((lifts) => (this.lifts = lifts));
   }
 

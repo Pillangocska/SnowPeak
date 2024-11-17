@@ -4,6 +4,7 @@ import L, * as Leaflet from 'leaflet';
 import { LatLngExpression } from 'leaflet';
 import { LiftControllerService } from '../api/services';
 import { LiftResponseModel } from '../api/models';
+import { RabbitmqService } from '../shared/services/rabbitmq.service';
 
 @Component({
   selector: 'app-public',
@@ -14,18 +15,33 @@ import { LiftResponseModel } from '../api/models';
 })
 export class PublicComponent implements OnInit, AfterViewInit {
   map: any;
+  private liftLayers: Map<
+    string,
+    { polyline?: L.Polyline; tooltip?: L.Tooltip }
+  > = new Map();
 
   liftService = inject(LiftControllerService);
+  rabbitMqService = inject(RabbitmqService);
 
   lifts?: Array<LiftResponseModel>;
+
+  publicMessages: Array<any> = [];
 
   constructor() {}
 
   ngOnInit(): void {
     this.liftService.getPublicLifts().subscribe((lifts) => {
       this.lifts = lifts;
-      this.initLifts();
+      this.drawLifts();
     });
+
+    this.rabbitMqService
+      .watchPublicLiftsMessages()
+      .subscribe((publicLiftMessage) => {
+        console.log(publicLiftMessage);
+        this.publicMessages.unshift(publicLiftMessage);
+        this.drawLifts();
+      });
   }
 
   ngAfterViewInit(): void {
@@ -40,33 +56,109 @@ export class PublicComponent implements OnInit, AfterViewInit {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
     } as Leaflet.TileLayerOptions).addTo(this.map);
-
-    // const latlngs = [
-    //   new Leaflet.LatLng(46.69539731050563, 13.914595364129971),
-    //   new Leaflet.LatLng(46.693828878676364, 13.92304607372536),
-    // ] as LatLngExpression[];
-
-    // var polyline = L.polyline(latlngs, { color: 'red' }).addTo(this.map);
-
-    // var tooltip = L.tooltip({
-    //   permanent: true,
-    //   direction: 'right',
-    //   offset: L.point(5, -5),
-    // })
-    //   .setLatLng(new Leaflet.LatLng(46.693828878676364, 13.92304607372536))
-    //   .setContent('45min.')
-    //   .addTo(this.map);
   }
 
-  initLifts(): void {
+  private clearLiftLayers(liftId: string): void {
+    const layers = this.liftLayers.get(liftId);
+    if (layers) {
+      if (layers.polyline) {
+        this.map.removeLayer(layers.polyline);
+      }
+      if (layers.tooltip) {
+        this.map.removeLayer(layers.tooltip);
+      }
+    }
+  }
+
+  drawLifts(): void {
     console.log(this.lifts);
     this.lifts?.forEach((lift) => {
-      const latlngs = [
-        new Leaflet.LatLng(lift.startLatitude ?? 0, lift.startLongitude ?? 0),
-        new Leaflet.LatLng(lift.endLatitude ?? 0, lift.endLongitude ?? 0),
-      ] as LatLngExpression[];
+      if (lift.id) {
+        this.clearLiftLayers(lift.id);
+      }
 
-      var polyline = L.polyline(latlngs, { color: 'red' }).addTo(this.map);
+      const startPoint = new Leaflet.LatLng(
+        lift.startLatitude ?? 0,
+        lift.startLongitude ?? 0,
+      );
+      const endPoint = new Leaflet.LatLng(
+        lift.endLatitude ?? 0,
+        lift.endLongitude ?? 0,
+      );
+
+      const latlngs = [startPoint, endPoint] as LatLngExpression[];
+
+      const latestLiftPublicMessage = this.publicMessages.find(
+        (message) => message.headers.lift_id === lift.id,
+      );
+
+      const messageBody = latestLiftPublicMessage?.body
+        ? JSON.parse(latestLiftPublicMessage?.body)
+        : undefined;
+
+      console.log(messageBody);
+
+      var lineColor = 'grey';
+
+      if (messageBody?.waitingTime >= 30) {
+        lineColor = 'red';
+      } else if (messageBody?.waitingTime >= 15) {
+        lineColor = 'orange';
+      } else if (messageBody?.waitingTime >= 5) {
+        lineColor = 'yellow';
+      } else if (messageBody?.waitingTime > 0) {
+        lineColor = 'black';
+      }
+
+      var lineWeight = 3;
+
+      switch (messageBody?.skiLiftState) {
+        case 'HALF_STEAM':
+          lineWeight = 5;
+          break;
+        case 'FULL_STEAM':
+          lineWeight = 7;
+      }
+
+      const polyline = L.polyline(latlngs, {
+        color: messageBody?.skiLiftState === 'STOPPED' ? 'red' : lineColor,
+        weight: lineWeight,
+        dashArray: '30, 10',
+        dashOffset: '20',
+      }).addTo(this.map);
+
+      const layers: { polyline: L.Polyline; tooltip?: L.Tooltip } = {
+        polyline: polyline,
+      };
+
+      if (messageBody?.waitingTime >= 0) {
+        const tooltip = L.tooltip({
+          permanent: true,
+          direction: 'right',
+          offset: L.point(5, -5),
+        })
+          .setLatLng(endPoint)
+          .setContent(messageBody?.waitingTime.toString() + ' min')
+          .addTo(this.map);
+
+        layers.tooltip = tooltip;
+      }
+
+      if (lift.id) {
+        this.liftLayers.set(lift.id, layers);
+      }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.liftLayers.forEach((layers) => {
+      if (layers.polyline) {
+        this.map.removeLayer(layers.polyline);
+      }
+      if (layers.tooltip) {
+        this.map.removeLayer(layers.tooltip);
+      }
+    });
+    this.liftLayers.clear();
   }
 }
