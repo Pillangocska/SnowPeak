@@ -3,10 +3,10 @@
 import json
 from datetime import datetime
 
+from ski_lift.core.command.descriptor.object import \
+    MessageReportCommandDescriptor
 from ski_lift.core.remote.communicator.base import RemoteCommunicator
 from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
-
-from ski_lift.core.command.descriptor.object import MessageReportCommandDescriptor
 
 
 class RabbitMQCommunicator(RemoteCommunicator):

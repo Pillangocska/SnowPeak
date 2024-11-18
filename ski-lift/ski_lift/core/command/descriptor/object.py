@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
-from typing import TYPE_CHECKING, ClassVar, Optional, Any
+from typing import TYPE_CHECKING, Any, ClassVar, Optional
 
 if TYPE_CHECKING:
     from ski_lift.core.command.descriptor.processor import DescriptorProcessor

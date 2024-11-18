@@ -8,7 +8,6 @@ from enum import Enum
 from camel_converter import dict_to_snake
 
 
-
 class SuggestionCategory(Enum):
 
     INFO = 'INFO'

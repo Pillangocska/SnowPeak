@@ -1,11 +1,11 @@
 """Remote communicator implementation."""
 
+import random
 from abc import ABC, abstractmethod
 from random import random
 from threading import Event, Thread
 from time import sleep
 from typing import TYPE_CHECKING
-import random
 
 from ski_lift.core.command.descriptor.object import \
     MessageReportCommandDescriptor

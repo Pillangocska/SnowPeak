@@ -10,7 +10,6 @@ from ski_lift.core.command.descriptor.serializer.base import \
 from ski_lift.core.utils import class_name_to_snake
 
 
-
 class PythonDictDescriptorSerializer(BaseDescriptorSerializer):
     """Python dict descriptor serializer.
     

@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Optional, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,

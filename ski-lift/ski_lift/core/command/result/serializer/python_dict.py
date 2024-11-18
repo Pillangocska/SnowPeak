@@ -2,7 +2,11 @@
 
 from typing import Any
 
-from ski_lift.core.command.result.object import CommandResult, AbortCommandResult, ChangeStateCommandResult, InsertCardCommandResult, MessageReportCommandResult
+from ski_lift.core.command.result.object import (AbortCommandResult,
+                                                 ChangeStateCommandResult,
+                                                 CommandResult,
+                                                 InsertCardCommandResult,
+                                                 MessageReportCommandResult)
 from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from ski_lift.core.utils import class_name_to_snake
 
