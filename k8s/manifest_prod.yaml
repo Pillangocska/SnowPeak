@@ -111,11 +111,10 @@ kind: Service
 metadata:
   name: frontend
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 31080
   selector:
     app: frontend
 ---
@@ -202,7 +201,7 @@ kind: Service
 metadata:
   name: rabbitmq
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
     - name: amqp
       port: 5672
@@ -210,11 +209,9 @@ spec:
     - name: management
       port: 15672
       targetPort: 15672
-      nodePort: 31672
     - name: websocket
       port: 15674
       targetPort: 15674
-      nodePort: 31674
   selector:
     app: rabbitmq
 ---
@@ -269,11 +266,10 @@ kind: Service
 metadata:
   name: keycloak
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
     - port: 9090
       targetPort: 8080
-      nodePort: 31090
   selector:
     app: keycloak
 ---
@@ -312,6 +308,12 @@ spec:
               value: "keycloak"
             - name: KC_DB_PASSWORD
               value: "password"
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+            - name: KC_HOSTNAME_STRICT_HTTPS
+              value: "false"
+            - name: KC_PROXY
+              value: "edge"
           volumeMounts:
             - name: keycloak-realms
               mountPath: /opt/keycloak/data/import

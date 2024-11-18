@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
   keycloak: {
-    realm: 'docker-realm',
-    clientId: 'docker-frontend',
+    realm: 'snow-peak',
+    clientId: 'snow-peak',
     url: 'http://localhost:9090',
   },
 };
