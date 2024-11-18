@@ -30,6 +30,24 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 5000
+    template:
+      retry:
+        enabled: true
+        initial-interval: 2000
+        max-attempts: 5
+        max-interval: 10000
+        multiplier: 1.5
+
+rabbitmq:
+  exchange:
+    name: direct_suggestions
+
 springdoc:
   enable-native-support: true
   default-produces-media-type: application/json
