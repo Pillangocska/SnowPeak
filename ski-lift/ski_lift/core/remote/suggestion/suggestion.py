@@ -15,6 +15,13 @@ class SuggestionCategory(Enum):
     DANGER = 'DANGER'
 
 
+severity_color_mapping = {
+    SuggestionCategory.INFO: 'blue',
+    SuggestionCategory.WARNING: 'yellow',
+    SuggestionCategory.DANGER: 'red',
+}
+
+
 @dataclass(kw_only=True)
 class Suggestion:
     """Suggestion representation.
@@ -39,6 +46,12 @@ class Suggestion:
             self.time = datetime.datetime.fromisoformat(self.time)
         if isinstance(self.category, str):
             self.category = SuggestionCategory(self.category.upper())
+
+    @property
+    def as_rich_text(self) -> str:
+        formatted_time = self.time.strftime("%Y-%m-%d %H:%M:%S")
+        severity_color = severity_color_mapping.get(self.category, 'purple')
+        return f'[{severity_color}][{formatted_time}] [{self.category.name}]  {self.message}[/{severity_color}]'
 
     @classmethod
     def from_dict(cls, data: dict) -> 'Suggestion':

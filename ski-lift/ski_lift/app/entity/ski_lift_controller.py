@@ -4,21 +4,20 @@ from ski_lift.core.auth.authorizer.base_authorizer import send_through_auth
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
     DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
-    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
+    InsertCardCommandDescriptor, MessageReportCommandDescriptor,
+    RemoveCardCommandDescriptor)
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
                                                  DisplayStatusCommandResult,
                                                  EmergencyStopCommandResult,
                                                  InsertCardCommandResult,
+                                                 MessageReportCommandResult,
                                                  RemoveCardCommandResult)
 from ski_lift.core.controller import Controller
 from ski_lift.core.monitor.descriptor.descriptor_monitor import \
     monitor_descriptor
 from ski_lift.core.monitor.result.result_monitor import monitor_result
-
-from ski_lift.core.command.descriptor.object import MessageReportCommandDescriptor
-from ski_lift.core.command.result.object import MessageReportCommandResult
 
 
 class SkiLiftController(Controller):

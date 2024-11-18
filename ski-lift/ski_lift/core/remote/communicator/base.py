@@ -1,6 +1,6 @@
 """Remote communicator implementation."""
 
-import random
+from random import randint
 from abc import ABC, abstractmethod
 from random import random
 from threading import Event, Thread
@@ -68,7 +68,7 @@ class RemoteCommunicator(ABC):
     def status_update_loop(self) -> None:
         # randomize start time so the lifts
         # wont send data at the exact same time
-        sleep(random.randint(0, self._status_update_interval))
+        sleep(randint(0, self._status_update_interval))
         while not self._stop_event.is_set():
             self.send_status_update()
             sleep(self._status_update_interval)

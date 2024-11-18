@@ -44,7 +44,7 @@ class BaseView(CommandPanel, CommandResultMonitor):
         """
 
     @abstractmethod
-    def display_suggestion(self, suggestion: Suggestion) -> None:
+    def display_suggestion(self, suggestion: Suggestion, **kwargs) -> None:
         """Display suggestion.
         
         This function is responsible for displaying a suggestion on the user
