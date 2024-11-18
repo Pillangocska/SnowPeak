@@ -20,6 +20,9 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EmergencyStopDialogComponent } from '../shared/components/emergency-stop-dialog/emergency-stop-dialog.component';
 import { Subscription } from 'rxjs';
 import { RabbitmqService } from '../shared/services/rabbitmq.service';
+import { StatusPipe } from '../api/shared/pipe/status.pipe';
+import { InternalKeycloakService } from '../shared/services/internal-keycloak.service';
+import { PublicComponent } from '../public/public.component';
 
 @Component({
   selector: 'app-operator',
@@ -32,14 +35,20 @@ import { RabbitmqService } from '../shared/services/rabbitmq.service';
     MatDividerModule,
     MatCardModule,
     MatDialogModule,
+    StatusPipe,
+    PublicComponent,
   ],
   templateUrl: './operator.component.html',
   styleUrl: './operator.component.scss',
 })
 export class OperatorComponent implements OnInit {
-  @ViewChild('logContainer') private logContainer!: ElementRef;
+  @ViewChild('temperatureLogContainer')
+  private temperatureLogContainer!: ElementRef;
+  @ViewChild('windLogContainer') private windLogContainer!: ElementRef;
+  @ViewChild('commandContainer') private commandContainer!: ElementRef;
 
   keycloakService = inject(KeycloakService);
+  internalKeycloakService = inject(InternalKeycloakService);
   rabbitMqService = inject(RabbitmqService);
   rxStompService = inject(RxStompService);
   logService = inject(LogControllerService);
@@ -47,46 +56,113 @@ export class OperatorComponent implements OnInit {
   cdr = inject(ChangeDetectorRef);
   dialog = inject(MatDialog);
 
-  liftSubscription?: Subscription;
+  liftTemperatureSensorSubscription?: Subscription;
+  liftWindSensorSubscription?: Subscription;
+  liftStatusSubscription?: Subscription;
+  liftCommandSubscription?: Subscription;
 
   lifts?: Array<PrivateLiftResponseModel>;
   selectedLiftId?: string;
 
-  liftStatus: 'FULL_STEAM' | 'HALF_STEAM' | 'STOPPED' = 'HALF_STEAM';
+  operatorId?: string;
 
-  logs: string[] = [];
+  liftStatus?: 'FULL_STEAM' | 'HALF_STEAM' | 'STOPPED';
+
+  temperatureLogs: string[] = [];
+  windLogs: string[] = [];
+  commands: string[] = [];
 
   message?: string;
 
   ngOnInit(): void {
     this.keycloakService.getToken().then((val) => console.log(val));
 
+    console.log(this.internalKeycloakService.getUserId());
+
+    this.operatorId = this.internalKeycloakService.getUserId();
     this.liftService
       .getPrivateLiftsByOperatorId({
-        operatorId: 'b21f687b-02fc-4556-b2a4-17a9eb905033',
+        operatorId: this.operatorId ?? '',
       })
       .subscribe((lifts) => (this.lifts = lifts));
   }
 
-  private watchSelectedLift(): void {
+  private watchSelectedLiftTemperatureSensors(): void {
     console.log(this.selectedLiftId);
     if (this.selectedLiftId) {
-      this.liftSubscription = this.rabbitMqService
-        .watchSensorsByLiftId(this.selectedLiftId)
+      this.liftTemperatureSensorSubscription = this.rabbitMqService
+        .watchTemperatureSensorsByLiftId(this.selectedLiftId)
         .subscribe((message: any) => {
           console.log(JSON.parse(message.body));
-          this.logs = [JSON.parse(message.body), ...this.logs];
+          this.temperatureLogs = [
+            JSON.parse(message.body),
+            ...this.temperatureLogs,
+          ];
           setTimeout(() => {
-            this.scrollToBottom();
+            this.scrollToBottom(
+              false,
+              this.temperatureLogContainer.nativeElement,
+            );
           });
         });
     } else {
-      this.liftSubscription?.unsubscribe();
+      this.liftTemperatureSensorSubscription?.unsubscribe();
+      this.temperatureLogs = [];
     }
   }
 
-  scrollToBottom(force: boolean = false): void {
-    const element = this.logContainer.nativeElement;
+  private watchSelectedLiftWindSensors(): void {
+    console.log(this.selectedLiftId);
+    if (this.selectedLiftId) {
+      this.liftWindSensorSubscription = this.rabbitMqService
+        .watchWindSensorsByLiftId(this.selectedLiftId)
+        .subscribe((message: any) => {
+          console.log(JSON.parse(message.body));
+          this.windLogs = [JSON.parse(message.body), ...this.windLogs];
+          setTimeout(() => {
+            this.scrollToBottom(false, this.windLogContainer.nativeElement);
+          });
+        });
+    } else {
+      this.liftWindSensorSubscription?.unsubscribe();
+      this.windLogs = [];
+    }
+  }
+
+  private watchSelectedLiftStatus(): void {
+    console.log(this.selectedLiftId);
+    if (this.selectedLiftId) {
+      this.liftStatusSubscription = this.rabbitMqService
+        .watchPublicLiftsMessagesByLiftId(this.selectedLiftId)
+        .subscribe((message: any) => {
+          console.log(JSON.parse(message.body));
+          this.liftStatus = JSON.parse(message?.body)?.skiLiftState;
+        });
+    } else {
+      this.liftStatusSubscription?.unsubscribe();
+      this.liftStatus = undefined;
+    }
+  }
+
+  private watchSelectedLiftCommands(): void {
+    console.log(this.selectedLiftId);
+    if (this.selectedLiftId) {
+      this.liftCommandSubscription = this.rabbitMqService
+        .watchCommandsByLiftId(this.selectedLiftId)
+        .subscribe((command: any) => {
+          console.log(JSON.parse(command.body));
+          this.commands = [JSON.parse(command.body), ...this.commands];
+          setTimeout(() => {
+            this.scrollToBottom(false, this.commandContainer.nativeElement);
+          });
+        });
+    } else {
+      this.liftCommandSubscription?.unsubscribe();
+      this.commands = [];
+    }
+  }
+
+  scrollToBottom(force: boolean = false, element: any): void {
     const isAtBottom =
       element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
 
@@ -98,13 +174,26 @@ export class OperatorComponent implements OnInit {
   goToLift(liftId: string) {
     console.log(liftId);
     this.selectedLiftId = this.selectedLiftId === liftId ? undefined : liftId;
-    this.logs = [];
+    this.temperatureLogs = [];
+    this.windLogs = [];
+    this.commands = [];
+    this.liftStatus = undefined;
 
-    this.watchSelectedLift();
+    this.watchSelectedLiftTemperatureSensors();
+    this.watchSelectedLiftWindSensors();
+    this.watchSelectedLiftStatus();
+    this.watchSelectedLiftCommands();
   }
 
   sendMessage() {
     console.log(this.message);
+    let body: any = {};
+    body.messageKind = 'suggestion';
+    body.severity = 'INFO';
+    body.message = this.message;
+    body.user = this.operatorId;
+    body.timestamp = new Date().toISOString().slice(0, -1);
+    this.rabbitMqService.sendSuggestion(this.selectedLiftId ?? '', body);
     this.message = undefined;
   }
 
@@ -112,8 +201,10 @@ export class OperatorComponent implements OnInit {
     const dialogRef = this.dialog.open(EmergencyStopDialogComponent);
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        console.log('EMERGENCY STOP');
+      if (result && this.selectedLiftId) {
+        result.user = this.operatorId;
+        result.timestamp = new Date().toISOString().slice(0, -1);
+        this.rabbitMqService.sendEmergencyStop(this.selectedLiftId, result);
       }
     });
   }

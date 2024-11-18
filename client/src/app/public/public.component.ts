@@ -1,5 +1,5 @@
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { AfterViewInit, Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, inject } from '@angular/core';
 import L, * as Leaflet from 'leaflet';
 import { LatLngExpression } from 'leaflet';
 import { LiftControllerService } from '../api/services';
@@ -14,6 +14,8 @@ import { RabbitmqService } from '../shared/services/rabbitmq.service';
   styleUrl: './public.component.scss',
 })
 export class PublicComponent implements OnInit, AfterViewInit {
+  @Input() isMasterView = false;
+
   map: any;
   private liftLayers: Map<
     string,
@@ -51,7 +53,10 @@ export class PublicComponent implements OnInit, AfterViewInit {
       doubleClickZoom: false,
       touchZoom: false,
       scrollWheelZoom: false,
-    }).setView([46.69677386797277, 13.914833305225734], 14);
+    }).setView(
+      [46.69677386797277, 13.914833305225734],
+      this.isMasterView ? 12 : 14,
+    );
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',

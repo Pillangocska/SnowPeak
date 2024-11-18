@@ -17,17 +17,46 @@
       }
     </mat-chip-listbox>
     
-    <mat-card class="log-card">
-      <label class="label">Szenzor adatok:</label>
-      <div #logContainer class="log-container" [scrollTop]="logContainer.scrollHeight">
-        @for (log of logs; track log) {
-          <p class="log-line">{{ log | json }}</p>
-        }
-        @empty {
-          <p class="sensor-notice">Válasszon az elérhető liftek közül, hogy lássa a szenzoradatokat!</p>
-        }
-      </div>
-    </mat-card>
+    <div class="grid-container">
+      <mat-card class="log-card">
+        <label class="label">Hőmérséklet szenzor adatok:</label>
+        <div #temperatureLogContainer class="log-container" [scrollTop]="temperatureLogContainer.scrollHeight">
+          @for (temperatureLog of temperatureLogs; track temperatureLog) {
+            <p class="log-line">{{ temperatureLog | json }}</p>
+          }
+          @empty {
+            <p class="sensor-notice">Válasszon az elérhető liftek közül, hogy lássa a hőmérséklet szenzoradatokat!</p>
+          }
+        </div>
+      </mat-card>
+      <mat-card class="log-card">
+        <label class="label">Szél szenzor adatok:</label>
+        <div #windLogContainer class="log-container" [scrollTop]="windLogContainer.scrollHeight">
+          @for (windLog of windLogs; track windLog) {
+            <p class="log-line">{{ windLog | json }}</p>
+          }
+          @empty {
+            <p class="sensor-notice">Válasszon az elérhető liftek közül, hogy lássa a szél szenzoradatokat!</p>
+          }
+        </div>
+      </mat-card>
+      <mat-card class="log-card">
+        <label class="label">Parancsok:</label>
+        <div #commandContainer class="log-container" [scrollTop]="commandContainer.scrollHeight">
+          @for (command of commands; track command) {
+            <p class="log-line">{{ command | json }}</p>
+          }
+          @empty {
+            <p class="sensor-notice">Válasszon az elérhető liftek közül és láthatja majd a parancsokat!</p>
+          }
+        </div>
+      </mat-card>
+      <mat-card class="log-card">
+        <label class="label">Publikus nézet:</label>
+        <app-public [isMasterView]="true"></app-public>
+      </mat-card>
+    </div>
+
   }
 }
 @else {
@@ -39,9 +68,7 @@
   <section class="action-container">
     <mat-card class="action-items-container">
       <label class="card-label">Ütemezés</label>
-      <button mat-flat-button type="button" [disabled]="liftStatus === 'STOPPED'" (click)="liftStatus = 'STOPPED'">{{ "Leállítás" }}</button>
-      <button mat-flat-button type="button" [disabled]="liftStatus === 'FULL_STEAM'" (click)="liftStatus = 'FULL_STEAM'">{{ "Teljes gőz" }}</button>
-      <button mat-flat-button type="button" [disabled]="liftStatus === 'HALF_STEAM'" (click)="liftStatus = 'HALF_STEAM'">{{ "Fél gőz" }}</button>
+      <span class="action-items-container--status">{{liftStatus | status}}</span>
     </mat-card>
   
     <mat-card class="action-items-container action-items-container--message">

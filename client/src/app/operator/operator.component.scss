@@ -4,6 +4,14 @@
     height: calc(100% - 16px);
     padding: 8px;
 
+    .grid-container {
+        height: calc(100% - 240px);
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+    }
+
     .auth-button {
         margin-bottom: 8px;
     }
@@ -19,7 +27,7 @@
 
     .log-card {
         flex: 1;
-        height: inherit;
+        // height: inherit;
         overflow: hidden;
         padding: 4px;
 
@@ -51,15 +59,20 @@
         flex-direction: row;
         justify-content: space-between;
         margin-top: 12px;
-    
+        
         .action-items-container {
             display: flex;
             flex-direction: row;
             padding: 12px 26px;
+            min-width: 100px;
             gap: 4px;
 
             &--message {
                 gap: 12px;
+            }
+
+            &--status {
+                margin: auto;
             }
         }
     }
