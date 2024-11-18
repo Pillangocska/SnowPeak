@@ -31,5 +31,4 @@ class RabbitMQSuggestionForwarder(SuggestionForwarder):
         self._consumer.stop()
 
     def suggestion_callback(self, ch, method, properties, body):
-        print('received suggestion')
         self._view.display_suggestion(Suggestion.from_json(body.decode('utf-8')))

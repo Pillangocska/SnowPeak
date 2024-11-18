@@ -3,6 +3,7 @@
 from string import Template
 from typing import Any
 
+from ..controller import Controller
 from ski_lift import __version__
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
@@ -42,6 +43,11 @@ Available commands:
         - Send a report to the central room.
         - Possible severities are INFO, WARNING and DANGER.
 
+    suggestion_level <SEVERITY>
+        - Suggestions with severities equal to or greater than the selected level will be displayed.
+        - Order is INFO < WARNING < DANGER.
+        - If you set it to NONE, no suggestions will be displayed.
+
     help
         - Displays this help message listing all available commands.
 """
@@ -58,6 +64,10 @@ lift id: $lift_id$current_user
 """
 
 class CommandLineInterfaceView(BaseView):
+
+    def __init__(self, controller: Controller, *args, **kwargs) -> None:
+        self._suggestion_level: str = ['INFO', 'WARNING', 'DANGER']
+        super().__init__(controller, *args, **kwargs)
 
     class UnsupportedCommand(Exception):
         pass
@@ -89,6 +99,7 @@ class CommandLineInterfaceView(BaseView):
 
             try:
                 match(command_name):
+                    case 'suggestion_level': self.set_suggestion_level(*args)
                     case 'insert_card': self.insert_card(*args)
                     case 'remove_card': self.remove_card()
                     case 'change_state': self.change_state(*args)
@@ -105,6 +116,13 @@ class CommandLineInterfaceView(BaseView):
                 )
             except TypeError as type_exc:
                 print(f'Incorrect arguments for command "{command_name}". Type "help" to display correct usage.')
+    def set_suggestion_level(self, level: str):
+        match(level.upper()):
+            case 'INFO': self._suggestion_level = ['INFO', 'WARNING', 'DANGER']
+            case 'WARNING': self._suggestion_level = ['WARNING', 'DANGER']
+            case 'DANGER': self._suggestion_level = ['DANGER']
+            case 'NONE': self._suggestion_level = []
+            case _: print(f'Did not recognize level "{level}".')
                 
     def process_insert_card_result(self, result: InsertCardCommandResult) -> Any:
         self.handle_result(result, 'CARD ACCEPTED')
@@ -136,5 +154,6 @@ class CommandLineInterfaceView(BaseView):
             print(str(result.exception))
 
     def display_suggestion(self, suggestion: Suggestion, reset_input=True) -> None:
-        formatted_time = suggestion.time.strftime("%Y-%m-%d %H:%M:%S")
-        print(f'\n[{formatted_time}] [{suggestion.category.name}]  {suggestion.message}{'\n\n>' if reset_input else '\n'}', end='')
+        if suggestion.category.name in self._suggestion_level:
+            formatted_time = suggestion.time.strftime("%Y-%m-%d %H:%M:%S")
+            print(f'\n[{formatted_time}] [{suggestion.category.name}]  {suggestion.message}{'\n\n>' if reset_input else '\n'}', end='')
