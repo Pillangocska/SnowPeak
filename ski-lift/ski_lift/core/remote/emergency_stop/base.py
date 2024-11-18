@@ -8,6 +8,13 @@ if TYPE_CHECKING:
 
 
 class RemoteEmergencyStopHandler(object):
+    """Remote emergency stop handler.
+    
+    This is an abstract class representing a consumer that waits for remote
+    emergency stop signals and executes them on the controller through the
+    view. It is necessary because the messages need to be displayed to users,
+    allowing them the option to cancel the actions.
+    """
 
     def __init__(self, view: 'BaseView') -> None:
         self._view: BaseView = view

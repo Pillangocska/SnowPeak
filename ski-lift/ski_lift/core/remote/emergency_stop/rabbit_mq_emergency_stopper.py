@@ -15,6 +15,11 @@ if TYPE_CHECKING:
 
 
 class RabbitMQEmergencyStopHandler(RemoteEmergencyStopHandler):
+    """RabbitMQ emergency stopper.
+    
+    This is a concrete implementation of the emergency stopper that utilizes
+    RabbitMQ exchanges to receive emergency stop signals.
+    """
 
     def __init__(self, view: 'BaseView') -> None:
         # todo: refactor code to prevent circular import 
