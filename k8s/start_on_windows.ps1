@@ -125,65 +125,7 @@ function Stop-ProcessOnPort {
     }
 }
 
-# Function to check if pod is ready and service is listening
-function Test-ServiceReady {
-    param ($podPrefix, $port)
-
-    # Get pod name
-    $podName = kubectl get pods | Select-String "^$podPrefix" | ForEach-Object { ($_ -split '\s+')[0] }
-    if (-not $podName) {
-        Write-Host "❌ Pod $podPrefix not found" -ForegroundColor Red
-        return $false
-    }
-
-    # Check if pod is ready
-    $podStatus = kubectl get pod $podName -o jsonpath="{.status.containerStatuses[0].ready}"
-    if ($podStatus -ne "true") {
-        Write-Host "Pod $podPrefix is not ready yet" -ForegroundColor Yellow
-        return $false
-    }
-
-    # For RabbitMQ, do additional check
-    if ($podPrefix -eq "rabbitmq") {
-        # Execute command in pod to check if management plugin is running
-        $managementCheck = kubectl exec $podName -- rabbitmq-diagnostics check_port_connectivity -p $port 2>&1
-        if ($managementCheck -match "error|failed") {
-            Write-Host "RabbitMQ management plugin not ready yet" -ForegroundColor Yellow
-            return $false
-        }
-    }
-
-    return $true
-}
-
-# Function to wait for service to be ready
-function Wait-ForService {
-    param ($podPrefix, $port)
-
-    Write-Host "Waiting for $podPrefix to be ready..." -ForegroundColor Yellow
-    $attempts = 0
-    $maxAttempts = 30
-    $ready = $false
-
-    while (-not $ready -and $attempts -lt $maxAttempts) {
-        $ready = Test-ServiceReady -podPrefix $podPrefix -port $port
-        if (-not $ready) {
-            $attempts++
-            Write-Host "Waiting for $podPrefix... Attempt $attempts of $maxAttempts" -ForegroundColor Gray
-            Start-Sleep -Seconds 5
-        }
-    }
-
-    if (-not $ready) {
-        Write-Host "❌ Timeout waiting for $podPrefix to be ready" -ForegroundColor Red
-        return $false
-    }
-
-    Write-Host "✅ $podPrefix is ready" -ForegroundColor Green
-    return $true
-}
-
-# Function to start port forwarding with retry
+# Simplified function to start port forwarding
 function Start-PortForward {
     param ($service, $localPort, $servicePort)
 
@@ -191,12 +133,6 @@ function Start-PortForward {
     if (Test-PortInUse $localPort) {
         Write-Host "Port $localPort is in use. Attempting to free it..." -ForegroundColor Yellow
         Stop-ProcessOnPort $localPort
-    }
-
-    # Wait for service to be ready first
-    if (-not (Wait-ForService -podPrefix $service -port $servicePort)) {
-        Write-Host "Failed to start port forwarding - service not ready" -ForegroundColor Red
-        return $null
     }
 
     # Try to start port forwarding
@@ -220,11 +156,12 @@ Write-Host "🔌 Setting up port forwarding..." -ForegroundColor Yellow
 # Store port forwarding jobs
 $portForwardJobs = @()
 
-# Start port forwarding for services with error handling
+# Start port forwarding for services
+# servicePort is the service's external port and localport is what we will access
 $services = @(
     @{service="rabbitmq"; localPort=15672; servicePort=15672},
     @{service="frontend"; localPort=80; servicePort=80},
-    @{service="keycloak"; localPort=9090; servicePort=8080}
+    @{service="keycloak"; localPort=9090; servicePort=9090}
 )
 
 foreach ($svc in $services) {
@@ -232,7 +169,7 @@ foreach ($svc in $services) {
     if ($job) {
         $portForwardJobs += $job
         # Add small delay between services
-        Start-Sleep -Seconds 2
+        Start-Sleep -Seconds 10
     }
 }
 
