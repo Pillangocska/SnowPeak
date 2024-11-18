@@ -78,7 +78,7 @@
     </mat-card>
   
     <mat-card class="action-items-container">
-      <button mat-flat-button type="button" [disabled]="liftStatus === 'STOPPED'" color="warn" (click)="emergencyStop()">{{ "VÉSZLEÁLLÁS" }}</button>
+      <button mat-flat-button type="button" [disabled]="!liftStatus || liftStatus === 'STOPPED'" color="warn" (click)="emergencyStop()">{{ "VÉSZLEÁLLÁS" }}</button>
     </mat-card>
   </section>
 }

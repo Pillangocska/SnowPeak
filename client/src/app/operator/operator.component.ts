@@ -89,6 +89,9 @@ export class OperatorComponent implements OnInit {
 
   private watchSelectedLiftTemperatureSensors(): void {
     console.log(this.selectedLiftId);
+    this.liftTemperatureSensorSubscription?.unsubscribe();
+    this.liftTemperatureSensorSubscription = undefined;
+
     if (this.selectedLiftId) {
       this.liftTemperatureSensorSubscription = this.rabbitMqService
         .watchTemperatureSensorsByLiftId(this.selectedLiftId)
@@ -106,13 +109,15 @@ export class OperatorComponent implements OnInit {
           });
         });
     } else {
-      this.liftTemperatureSensorSubscription?.unsubscribe();
       this.temperatureLogs = [];
     }
   }
 
   private watchSelectedLiftWindSensors(): void {
     console.log(this.selectedLiftId);
+    this.liftWindSensorSubscription?.unsubscribe();
+    this.liftWindSensorSubscription = undefined;
+
     if (this.selectedLiftId) {
       this.liftWindSensorSubscription = this.rabbitMqService
         .watchWindSensorsByLiftId(this.selectedLiftId)
@@ -124,13 +129,15 @@ export class OperatorComponent implements OnInit {
           });
         });
     } else {
-      this.liftWindSensorSubscription?.unsubscribe();
       this.windLogs = [];
     }
   }
 
   private watchSelectedLiftStatus(): void {
     console.log(this.selectedLiftId);
+    this.liftStatusSubscription?.unsubscribe();
+    this.liftStatusSubscription = undefined;
+
     if (this.selectedLiftId) {
       this.liftStatusSubscription = this.rabbitMqService
         .watchPublicLiftsMessagesByLiftId(this.selectedLiftId)
@@ -139,13 +146,15 @@ export class OperatorComponent implements OnInit {
           this.liftStatus = JSON.parse(message?.body)?.skiLiftState;
         });
     } else {
-      this.liftStatusSubscription?.unsubscribe();
       this.liftStatus = undefined;
     }
   }
 
   private watchSelectedLiftCommands(): void {
     console.log(this.selectedLiftId);
+    this.liftCommandSubscription?.unsubscribe();
+    this.liftCommandSubscription = undefined;
+
     if (this.selectedLiftId) {
       this.liftCommandSubscription = this.rabbitMqService
         .watchCommandsByLiftId(this.selectedLiftId)
@@ -157,7 +166,6 @@ export class OperatorComponent implements OnInit {
           });
         });
     } else {
-      this.liftCommandSubscription?.unsubscribe();
       this.commands = [];
     }
   }
