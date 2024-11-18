@@ -32,6 +32,8 @@ kubectl logs <pod-name>
 kubectl logs -l app=keycloak
 # shell into container:
 kubectl exec -it <pod-name> -- /bin/bash
+# attach to running container:
+kubectl attach nginx-pod -i -t
 # delete resources
 kubectl delete -f <filename>.yaml
 # list all configmaps
