@@ -1,5 +1,5 @@
 {
-    "realm": "docker-realm",
+    "realm": "snow-peak",
     "enabled": true,
     "displayName": "Docker Development Realm",
     "sslRequired": "external",
@@ -15,7 +15,7 @@
         }
       ],
       "client": {
-        "docker-frontend": [
+        "snow-peak": [
           {
             "name": "operator",
             "description": "Regular operator role"
@@ -40,7 +40,7 @@
         ],
         "realmRoles": ["operator"],
         "clientRoles": {
-          "docker-frontend": ["operator"]
+          "snow-peak": ["operator"]
         },
         "attributes": {
           "locale": ["en"]
@@ -49,7 +49,7 @@
     ],
     "clients": [
       {
-        "clientId": "docker-frontend",
+        "clientId": "snow-peak",
         "enabled": true,
         "publicClient": true,
         "redirectUris": [
