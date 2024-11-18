@@ -41,7 +41,22 @@ class CommandExecutor(DescriptorProcessor):
     """
 
     def execute(self, command: CommandDescriptor) -> CommandResult:
-        """Execute the """
+        """Execute the function and create an appropriate result result
+
+        Generally speaking if a command fails exceptions should be raised.
+        This try except block will catch the exception and create a failed
+        result with the exception in it.
+
+        Using custom exceptions with descriptive messages is a good practice,
+        as it allows other components (such as views) to rely on them and
+        present these messages to users.
+
+        Args:
+            command (CommandDescriptor): command to execute.
+
+        Returns:
+            CommandResult: result for the command
+        """
         try:
             return self.process_descriptor(command)
         except Exception as exc:
@@ -51,6 +66,7 @@ class CommandExecutor(DescriptorProcessor):
         return super().process_descriptor(command)
 
     def process_descriptor_universally(self, command: CommandDescriptor) -> CommandResult:
+        """By default each command will return a successful result."""
         return DescriptorResultFactory().build(command, CommandResult.OutCome.SUCCESSFUL)
     
     def process_insert_card_descriptor(self, command: InsertCardCommandDescriptor) -> InsertCardCommandResult:

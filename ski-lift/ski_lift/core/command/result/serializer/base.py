@@ -19,4 +19,5 @@ class BaseResultSerializer(ResultProcessor):
     """
 
     def serialize(self, result: CommandResult) -> Any:
+        """Serializer the result into a specified format."""
         return self.process_result(result)

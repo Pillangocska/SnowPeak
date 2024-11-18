@@ -19,7 +19,7 @@ class BaseAuthorizer(CommandExecutor):
 
     The idea is that the incoming commands can be handled specifically in
     their own process functions where if the given command is permitted or not
-    cam be decided individually. If the authorization process fails an error
+    can be decided individually. If the authorization process fails an error
     should be raised. The super class will generate the appropriate failed
     result with the given exception.
 
@@ -76,6 +76,7 @@ class CommandAuthorizable(ABC):
     def send_through_auth(self, command: CommandDescriptor) -> CommandResult:
         return self._authorizer.authorize(command)
         
+
 def send_through_auth(func: Callable[[CommandAuthorizable, CommandDescriptor], CommandResult]):
     """Send trough auth decorator.
     

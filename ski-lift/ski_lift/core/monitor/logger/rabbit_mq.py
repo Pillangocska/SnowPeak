@@ -11,22 +11,26 @@ from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
 
 
 class RabbitMQCommandLogger(BaseCommandLogger):
-    """RabbitMQ command logger."""
+    """RabbitMQ command logger.
+    
+    This logger uses rabbit mq exchanges to send log messages to subscribed
+    nodes.
+
+    By default, it uses the routing key pattern
+    `skilift.<lift_id>.logs.command.<outcome>`. Since the exchange is a topic,
+    this routing key supports various filtering options.
+    """
 
     def __init__(
         self,
-        descriptor_serializer: BaseDescriptorSerializer,
         result_serializer: BaseResultSerializer,
         pika_producer: PikaProducer,
         lift_id: str,
     ) -> None:
         self._pika_producer: PikaProducer = pika_producer
         self._lift_id: str = lift_id
-        super().__init__(descriptor_serializer=descriptor_serializer, result_serializer=result_serializer)
+        super().__init__(result_serializer=result_serializer)
 
-
-    def process_descriptor_universally(self, command: CommandDescriptor) -> None:
-        pass
 
     def process_result_universally(self, result: CommandResult) -> None:
         outcome: str = 'successful' if result.is_successful else 'failed'

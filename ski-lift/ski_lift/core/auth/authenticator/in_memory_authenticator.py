@@ -7,11 +7,10 @@ from ski_lift.core.auth.authenticator.base_authenticator import \
 class InMemoryAuthenticator(BaseAuthenticator):
     """Memory based authentication.
     
-    This is an example implementation of the authentication object which stores
-    the eligible cards in set.
+    Memory based authenticator class stores the eligible user cards in a simple
+    set. Only those cards will be eligible which are present in the set.
 
-    This version of authentication should be used for testing and 
-    developing purposes only.
+    Can be paired with loading user cards from a config file for example.
     """
 
     def __init__(self):
