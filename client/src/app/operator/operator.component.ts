@@ -95,8 +95,8 @@ export class OperatorComponent implements OnInit {
         .subscribe((message: any) => {
           console.log(JSON.parse(message.body));
           this.temperatureLogs = [
-            JSON.parse(message.body),
             ...this.temperatureLogs,
+            JSON.parse(message.body),
           ];
           setTimeout(() => {
             this.scrollToBottom(
@@ -118,7 +118,7 @@ export class OperatorComponent implements OnInit {
         .watchWindSensorsByLiftId(this.selectedLiftId)
         .subscribe((message: any) => {
           console.log(JSON.parse(message.body));
-          this.windLogs = [JSON.parse(message.body), ...this.windLogs];
+          this.windLogs = [...this.windLogs, JSON.parse(message.body)];
           setTimeout(() => {
             this.scrollToBottom(false, this.windLogContainer.nativeElement);
           });
@@ -151,7 +151,7 @@ export class OperatorComponent implements OnInit {
         .watchCommandsByLiftId(this.selectedLiftId)
         .subscribe((command: any) => {
           console.log(JSON.parse(command.body));
-          this.commands = [JSON.parse(command.body), ...this.commands];
+          this.commands = [...this.commands, JSON.parse(command.body)];
           setTimeout(() => {
             this.scrollToBottom(false, this.commandContainer.nativeElement);
           });
