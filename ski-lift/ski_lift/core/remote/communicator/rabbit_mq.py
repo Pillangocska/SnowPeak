@@ -6,11 +6,23 @@ from datetime import datetime
 from ski_lift.core.remote.communicator.base import RemoteCommunicator
 from ski_lift.core.remote.rabbitmq.pika_producer import PikaProducer
 
-from ...command.descriptor.object import MessageReportCommandDescriptor
+from ski_lift.core.command.descriptor.object import MessageReportCommandDescriptor
 
 
 class RabbitMQCommunicator(RemoteCommunicator):
-    """Rabbit mq based remote communicator."""
+    """Rabbit mq based remote communicator.
+    
+    This communicator uses a rabbit mq producer to send the desired messages
+    to the remote control centrum.
+
+    RabbitMQ exchanges:
+        - message report:
+            - route: `skilift.<lift_id>.logs.message_report`
+            - type: topic
+        - status_update:
+            - route: `skilift.<lift_id>.logs.status_update`
+            - type: topic
+    """
 
     def __init__(self, producer: PikaProducer, *args, **kwargs) -> None:
         self._producer = producer

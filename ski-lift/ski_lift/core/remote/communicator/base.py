@@ -1,6 +1,7 @@
 """Remote communicator implementation."""
 
 from abc import ABC, abstractmethod
+from random import random
 from threading import Event, Thread
 from time import sleep
 from typing import TYPE_CHECKING
@@ -15,8 +16,14 @@ if TYPE_CHECKING:
 class RemoteCommunicator(ABC):
     """Remote communicator.
     
-    This class is responsible for sending on demand messages to the control
-    center.
+    This is an abstract class that represents a communicator, which can be used
+    to send both on-demand and periodic messages to the remote control center
+    with the master operators.
+
+    Currently the supported messages are the periodic status updates about the
+    lift and the report messages initiated by the worker operator.
+
+    By default the status updates are sent every 5 seconds.
     """
 
     def __init__(self, status_update_interval: int = 5) -> None:
@@ -25,6 +32,16 @@ class RemoteCommunicator(ABC):
         self._thread: Thread = None
         self._stop_event: Event = None 
 
+    def __enter__(self):
+        """Needed for `with` keyword support."""
+        self.start()
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Needed for `with` keyword support."""
+        self.stop()
+        return False
+
     @property
     def lift_id(self) -> str:
         if self._controller is not None:
@@ -32,14 +49,6 @@ class RemoteCommunicator(ABC):
 
     def set_controller(self, controller: 'Controller') -> None:
         self._controller = controller
-
-    def __enter__(self):
-        self.start()
-        return self
-    
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.stop()
-        return False
 
     def start(self) -> None:
         if self._thread is None:
@@ -56,15 +65,18 @@ class RemoteCommunicator(ABC):
             
 
     def status_update_loop(self) -> None:
+        # randomize start time so the lifts
+        # wont send data at the exact same time
+        sleep(random.randint(0, self._status_update_interval))
         while not self._stop_event.is_set():
             self.send_status_update()
             sleep(self._status_update_interval)
 
     @abstractmethod
     def send_message_report(self, report: MessageReportCommandDescriptor):
-        """Send a message report the control centrum."""
+        """Send a message report the remote control centre."""
 
     
     @abstractmethod
     def send_status_update(self) -> None:
-        """Send a status update to the control centrum."""
+        """Send a status update to the remote control centre."""
