@@ -87,7 +87,7 @@ public class RabbitMQConsumer {
                 index = map.get("location").equals("base") ? 0 : 1;
                 if(temperatures.containsKey(liftUuid)) {
 
-                    if(isMoreThanPercentDifferent(temperatures.get(liftUuid).get(index), newTemperature, 0.5)){
+                    if(isMoreThanPercentDifferent(temperatures.get(liftUuid).get(index), newTemperature, 5)){
 
                         System.out.println("WARN!! Invalid temperature value!");
 
