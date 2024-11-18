@@ -12,13 +12,12 @@ from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  DisplayStatusCommandResult,
                                                  EmergencyStopCommandResult,
                                                  InsertCardCommandResult,
-                                                 RemoveCardCommandResult)
+                                                 RemoveCardCommandResult,
+                                                 MessageReportCommandResult)
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
 from ski_lift.core.view.base_view import BaseView
 
-from ..command.result.object import MessageReportCommandResult
-from ..controller import Controller
-from datetime import datetime
+from ski_lift.core.controller import Controller
 
 DEFAULT_HELP_TEXT: str = """
 [yellow]Available commands:
@@ -46,7 +45,7 @@ DEFAULT_HELP_TEXT: str = """
         - [cyan]Send a report to the central room.[/cyan]
         - [cyan]Possible severities are [orange3]INFO[/orange3], [orange3]WARNING[/orange3] and [orange3]DANGER[/orange3].[/cyan]
 
-    suggestion_level [blue]<SEVERITY>[/blue]
+    suggestion_level [blue]<severity>[/blue]
         - [cyan]Suggestions with severities equal to or greater than the selected level will be displayed.[/cyan]
         - [cyan]Order is [orange3]INFO[/orange3] < [orange3]WARNING[/orange3] < [orange3]DANGER[/orange3].[/cyan]
         - [cyan]If you set it to NONE, no suggestions will be displayed.[/cyan]
@@ -108,7 +107,7 @@ class CommandLineInterfaceView(BaseView):
                     case 'change_state': self.change_state(*args)
                     case 'display_status': self.display_status()
                     case 'emergency_stop': self.emergency_stop()
-                    case 'report': self.message_report(*args)
+                    case 'report': self.message_report(args[0], ' '.join(args[1:]))
                     case 'abort': self.abort_command(*args)
                     case 'help': print(DEFAULT_HELP_TEXT)
                     case 'exit': break
@@ -117,8 +116,7 @@ class CommandLineInterfaceView(BaseView):
                 print(
                     f'Did not recognize "{command_name}" command. Type "help" to display the available commands.'
                 )
-            except TypeError as type_exc:
-                print(type_exc)
+            except Exception as exc:
                 print(f'Incorrect arguments for command "{command_name}". Type "help" to display correct usage.')
     def set_suggestion_level(self, level: str):
         match(level.upper()):
