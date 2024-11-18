@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
-from typing import TYPE_CHECKING, ClassVar, Optional
+from typing import TYPE_CHECKING, Any, ClassVar, Optional
 
 if TYPE_CHECKING:
     from ski_lift.core.command.descriptor.processor import DescriptorProcessor
@@ -46,7 +46,8 @@ class CommandDescriptor(ABC):
         self.id = CommandDescriptor._generate_next_id()
 
     @abstractmethod
-    def accept(self, processor: 'DescriptorProcessor'):
+    def accept(self, processor: 'DescriptorProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         pass
 
     @classmethod
@@ -64,7 +65,8 @@ class InsertCardCommandDescriptor(CommandDescriptor):
 
     card_to_insert: str
 
-    def accept(self, processor: 'DescriptorProcessor'):
+    def accept(self, processor: 'DescriptorProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_insert_card_descriptor(self)
 
 
@@ -72,7 +74,8 @@ class InsertCardCommandDescriptor(CommandDescriptor):
 class RemoveCardCommandDescriptor(CommandDescriptor):
     """Command descriptor for removing cards from the control panel."""
     
-    def accept(self, processor: 'DescriptorProcessor'):
+    def accept(self, processor: 'DescriptorProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_remove_card_descriptor(self)
 
 
@@ -97,7 +100,8 @@ class ChangeStateCommandDescriptor(CommandDescriptor):
 
     new_state: Option
 
-    def accept(self, processor: 'DescriptorProcessor'):
+    def accept(self, processor: 'DescriptorProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_change_state_descriptor(self)
 
 
@@ -105,7 +109,8 @@ class ChangeStateCommandDescriptor(CommandDescriptor):
 class DisplayStatusCommandDescriptor(CommandDescriptor):
     """Command descriptor for displaying current status of the engine."""
     
-    def accept(self, processor: 'DescriptorProcessor'):
+    def accept(self, processor: 'DescriptorProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_display_status_descriptor(self)
 
 
@@ -119,7 +124,8 @@ class AbortCommandDescriptor(CommandDescriptor):
 
     command_to_abort: int
 
-    def accept(self, processor: 'DescriptorProcessor'):
+    def accept(self, processor: 'DescriptorProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_abort_command_descriptor(self)
     
 
@@ -127,13 +133,19 @@ class AbortCommandDescriptor(CommandDescriptor):
 class EmergencyStopCommandDescriptor(CommandDescriptor):
     """Command descriptor for emergency stop."""
 
-    def accept(self, processor: 'DescriptorProcessor'):
+    def accept(self, processor: 'DescriptorProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_emergency_stop_descriptor(self)
     
 
 @dataclass(kw_only=True)
 class MessageReportCommandDescriptor(CommandDescriptor):
-    """Command descriptor for reporting messages to the central room."""
+    """Command descriptor for reporting messages to the central room.
+    
+    Attributes:
+        severity (Severity): severity of the message.
+        message (str): the message it self
+    """
 
     class Severity(Enum):
 
@@ -144,5 +156,6 @@ class MessageReportCommandDescriptor(CommandDescriptor):
     severity: Severity
     message: str
 
-    def accept(self, processor: 'DescriptorProcessor'):
+    def accept(self, processor: 'DescriptorProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_message_report_descriptor(self)

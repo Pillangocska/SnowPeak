@@ -11,7 +11,11 @@ from ski_lift.core.command.descriptor.object import (
 
 
 class CommandDescriptorFactory:
-    """Command descriptor factory."""
+    """Command descriptor factory.
+    
+    This is a simple factory that makes it easier to instantiate
+    all the various command descriptors.
+    """
 
     @classmethod
     def create_insert_card(

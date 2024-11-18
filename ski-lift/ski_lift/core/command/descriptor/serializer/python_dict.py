@@ -4,15 +4,18 @@ from typing import Any
 
 from ski_lift.core.command.descriptor.object import (
     ChangeStateCommandDescriptor, CommandDescriptor,
-    InsertCardCommandDescriptor)
+    InsertCardCommandDescriptor, MessageReportCommandDescriptor)
 from ski_lift.core.command.descriptor.serializer.base import \
     BaseDescriptorSerializer
 from ski_lift.core.utils import class_name_to_snake
 
-from ..object import MessageReportCommandDescriptor
-
 
 class PythonDictDescriptorSerializer(BaseDescriptorSerializer):
+    """Python dict descriptor serializer.
+    
+    This is the default implementation that converts command descriptors
+    into python dicts.
+    """
 
     def process_descriptor_universally(self, command: CommandDescriptor) -> dict:
         return {

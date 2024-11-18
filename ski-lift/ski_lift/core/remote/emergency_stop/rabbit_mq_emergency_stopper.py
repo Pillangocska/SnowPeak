@@ -15,6 +15,11 @@ if TYPE_CHECKING:
 
 
 class RabbitMQEmergencyStopHandler(RemoteEmergencyStopHandler):
+    """RabbitMQ emergency stopper.
+    
+    This is a concrete implementation of the emergency stopper that utilizes
+    RabbitMQ exchanges to receive emergency stop signals.
+    """
 
     def __init__(self, view: 'BaseView') -> None:
         # todo: refactor code to prevent circular import 
@@ -41,9 +46,10 @@ class RabbitMQEmergencyStopHandler(RemoteEmergencyStopHandler):
                 suggestion=Suggestion(
                     sender_card_number=message.get('user'),
                     time=datetime.fromisoformat(message.get('timestamp', datetime.now().isoformat())),
-                    message=f'Emergency stop in {abort_time} seconds. Reason: {message.get('message')}',
+                    message=f'{message.get('message')}\nEmergency stop in {abort_time} seconds.',
                     category='DANGER',
                 ),
+                reset_input=False,
             )
             self._view.emergency_stop(delay=abort_time)
         except Exception:

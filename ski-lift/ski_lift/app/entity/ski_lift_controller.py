@@ -1,30 +1,36 @@
 """Controller implementation."""
 
-from ski_lift.core.auth.authorizer.base_authorizer import (BaseAuthorizer,
-                                                           send_through_auth)
+from ski_lift.core.auth.authorizer.base_authorizer import send_through_auth
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
     DisplayStatusCommandDescriptor, EmergencyStopCommandDescriptor,
-    InsertCardCommandDescriptor, RemoveCardCommandDescriptor)
+    InsertCardCommandDescriptor, MessageReportCommandDescriptor,
+    RemoveCardCommandDescriptor)
 from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  ChangeStateCommandResult,
                                                  CommandResult,
                                                  DisplayStatusCommandResult,
                                                  EmergencyStopCommandResult,
                                                  InsertCardCommandResult,
+                                                 MessageReportCommandResult,
                                                  RemoveCardCommandResult)
 from ski_lift.core.controller import Controller
-from ski_lift.core.engine import Engine
 from ski_lift.core.monitor.descriptor.descriptor_monitor import \
     monitor_descriptor
 from ski_lift.core.monitor.result.result_monitor import monitor_result
-from ski_lift.core.remote.communicator import RemoteCommunicator
-
-from ...core.command.descriptor.object import MessageReportCommandDescriptor
-from ...core.command.result.object import MessageReportCommandResult
 
 
 class SkiLiftController(Controller):
+    """Ski lift controller.
+    
+    This is the concrete implementation for the ski lift controller.
+
+    Each command is monitored, allowing subscribed monitors to
+    receive and process them.
+
+    The EmergencyStop, InsertCard and RemoveCard commands does not require
+    authentication (inserted card) everything else does.
+    """
 
     def handle_delayed(self, command: CommandDescriptor):
         self.authenticate_delayed(command)

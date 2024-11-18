@@ -19,6 +19,12 @@ class DelayedCommandExecutor(CommandExecutor):
 
     Also the delayed commands can be aborted as well before the scheduled
     execution.
+
+    The concept is to decide before execution whether a command should run
+    immediately or be delayed. Delayed commands are added to a list, which a
+    background thread periodically processes. When the scheduled time arrives,
+    the commands are executed. To abort a command, it is simply removed from
+    the list.
     """
 
     def __init__(self, *args, **kwargs):
@@ -30,26 +36,37 @@ class DelayedCommandExecutor(CommandExecutor):
         super().__init__(*args, **kwargs)
 
     def __enter__(self):
+        """Needed for `with` keyword support."""
         self.start()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """Needed for `with` keyword support."""
         self.stop()
         return False
 
     def start(self):
-        """Start the execution thread.
-        
-        Delayed commands will be processed in the background.
-        """
+        """Simply start the execution thread."""
         self._executor_thread.start()
 
     def stop(self):
-        """Stop the execution thread."""
+        """Stop the execution thread and wait for it."""
         self._stop_event.set()
         self._executor_thread.join()
 
     def execute(self, descriptor: CommandDescriptor) -> CommandResult:
+        """Execute commands with delayed support.
+
+        Non delayed commands are executed immediately, delayed ones are
+        put aside for later processing. Delayed commands have a special
+        result type with outcome as `DELAYED`.
+
+        Args:
+            descriptor (CommandDescriptor): command to execute.
+
+        Returns:
+            CommandResult: result for the command.
+        """
         if self.is_delayed(descriptor):
             self.handle_delayed(descriptor)
             return self._create_delayed_result(descriptor)
@@ -57,6 +74,7 @@ class DelayedCommandExecutor(CommandExecutor):
             return super().execute(descriptor)
         
     def is_delayed(self, descriptor: CommandDescriptor) -> bool:
+        """A command is delayed if the current is smaller than t"""
         current_time = time.time()
         return current_time < descriptor.time.timestamp() + descriptor.delay
     

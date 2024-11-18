@@ -2,15 +2,24 @@
 
 from typing import Any
 
-from ski_lift.core.command.result.object import CommandResult
+from ski_lift.core.command.result.object import (AbortCommandResult,
+                                                 ChangeStateCommandResult,
+                                                 CommandResult,
+                                                 InsertCardCommandResult,
+                                                 MessageReportCommandResult)
 from ski_lift.core.command.result.serializer.base import BaseResultSerializer
 from ski_lift.core.utils import class_name_to_snake
 
-from ..object import (AbortCommandResult, ChangeStateCommandResult,
-                      InsertCardCommandResult, MessageReportCommandResult)
-
 
 class PythonDictResultSerializer(BaseResultSerializer):
+    """Python dict descriptor serializer.
+    
+    This is the default implementation that converts command descriptors
+    into python dicts.
+
+    This serializer was created specifically to match the structure of the
+    rabbitMQ messages discussed previously.
+    """
 
     def process_result_universally(self, result: CommandResult) -> dict:
         return {

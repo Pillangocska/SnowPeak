@@ -10,6 +10,15 @@ from ski_lift.core.command.result.serializer.python_dict import \
 
 
 class JSONBytesResultSerializer(PythonDictResultSerializer):
+    """JSON bytes result serializer.
+    
+    This is a special serializer which can serialize results into json
+    byte strings.
+
+    By default the serializer converts key values into camel case
+    (from snake case).
+    """
+    
     
     def __init__(self, convert_to_camel: bool = True) -> None:
         self._convert_to_camel: bool = convert_to_camel

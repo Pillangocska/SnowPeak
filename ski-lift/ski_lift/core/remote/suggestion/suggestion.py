@@ -4,11 +4,8 @@ import datetime
 import json
 from dataclasses import dataclass
 from enum import Enum
-from re import M
 
 from camel_converter import dict_to_snake
-
-from ski_lift.core.utils import datetime_parser
 
 
 class SuggestionCategory(Enum):
@@ -18,14 +15,11 @@ class SuggestionCategory(Enum):
     DANGER = 'DANGER'
 
 
-def suggestion_category_parser(data):
-    for key, value in data.items():
-        if isinstance(value, str):
-            try:
-                data[key] = SuggestionCategory(value)
-            except ValueError:
-                pass
-    return data
+severity_color_mapping = {
+    SuggestionCategory.INFO: 'blue',
+    SuggestionCategory.WARNING: 'yellow',
+    SuggestionCategory.DANGER: 'red',
+}
 
 
 @dataclass(kw_only=True)
@@ -53,6 +47,12 @@ class Suggestion:
         if isinstance(self.category, str):
             self.category = SuggestionCategory(self.category.upper())
 
+    @property
+    def as_rich_text(self) -> str:
+        formatted_time = self.time.strftime("%Y-%m-%d %H:%M:%S")
+        severity_color = severity_color_mapping.get(self.category, 'purple')
+        return f'[{severity_color}][{formatted_time}] [{self.category.name}]  {self.message}[/{severity_color}]'
+
     @classmethod
     def from_dict(cls, data: dict) -> 'Suggestion':
         try:
@@ -68,9 +68,4 @@ class Suggestion:
         
     @classmethod
     def from_json(cls, json_str: str) -> 'Suggestion':
-        return cls.from_dict(dict_to_snake(
-            json.loads(
-                json_str,
-                object_hook=lambda data: datetime_parser(suggestion_category_parser(data)))
-            )
-        )
+        return cls.from_dict(dict_to_snake(json.loads(json_str)))

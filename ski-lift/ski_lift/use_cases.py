@@ -39,7 +39,7 @@ def attach_file_logger_to(controller: Controller):
     Args:
         controller (Controller): controller to attach to.
     """
-    command_logger = FileCommandLogger(PrettyStringDescriptorSerializer(), PrettyResultStringSerializer())
+    command_logger = FileCommandLogger(PrettyResultStringSerializer())
     command_logger.attach_to(controller)
 
 def attach_rabbit_mq_logger_to(controller: Controller, producer: PikaProducer):
@@ -50,7 +50,6 @@ def attach_rabbit_mq_logger_to(controller: Controller, producer: PikaProducer):
         producer (PikaProducer): _description_
     """
     rabbit_logger = RabbitMQCommandLogger(
-        descriptor_serializer=JSONBytesDescriptorSerializer(),
         result_serializer=JSONBytesResultSerializer(),
         pika_producer=producer,
         lift_id=controller.lift_id,

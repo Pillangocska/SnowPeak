@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from ski_lift.core.command.descriptor.object import (
     AbortCommandDescriptor, ChangeStateCommandDescriptor, CommandDescriptor,
@@ -39,6 +39,9 @@ class CommandResult(ABC):
         command (CommandDescriptor): Descriptor which this result relates to.
         outcome (OutCome): General outcome of the command.
         exception (Exception): Exception that's been raised during execution.
+
+    Most attributes are initialized to None by default, allowing them to be
+    modified later.
     """
 
     class OutCome(Enum):
@@ -62,7 +65,8 @@ class CommandResult(ABC):
         self.time = self.command.time + timedelta(self.command.delay)
 
     @abstractmethod
-    def accept(self, processor: 'ResultProcessor'):
+    def accept(self, processor: 'ResultProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         pass
 
     @property
@@ -76,7 +80,8 @@ class InsertCardCommandResult(CommandResult):
 
     command: Optional[InsertCardCommandDescriptor] = None
 
-    def accept(self, processor: 'ResultProcessor'):
+    def accept(self, processor: 'ResultProcessor') -> Any:        
+        """Used visitor pattern double dispatch."""
         return processor.process_insert_card_result(self)
 
 
@@ -86,7 +91,8 @@ class RemoveCardCommandResult(CommandResult):
     
     command: Optional[RemoveCardCommandDescriptor] = None
 
-    def accept(self, processor: 'ResultProcessor'):
+    def accept(self, processor: 'ResultProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_remove_card_result(self)
 
 
@@ -96,7 +102,8 @@ class ChangeStateCommandResult(CommandResult):
     
     command: Optional[ChangeStateCommandDescriptor] = None
     
-    def accept(self, processor: 'ResultProcessor'):
+    def accept(self, processor: 'ResultProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_change_state_result(self)
 
 
@@ -107,7 +114,8 @@ class DisplayStatusCommandResult(CommandResult):
     command: Optional[DisplayStatusCommandDescriptor] = None
     result: Optional[EngineState] = None
 
-    def accept(self, processor: 'ResultProcessor'):
+    def accept(self, processor: 'ResultProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_display_status_result(self)
 
 
@@ -117,7 +125,8 @@ class AbortCommandResult(CommandResult):
 
     command: Optional[AbortCommandDescriptor] = None
 
-    def accept(self, processor: 'ResultProcessor'):
+    def accept(self, processor: 'ResultProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_abort_command_result(self)
 
 
@@ -127,7 +136,8 @@ class EmergencyStopCommandResult(CommandResult):
     
     command: Optional[EmergencyStopCommandDescriptor] = None
 
-    def accept(self, processor: 'ResultProcessor'):
+    def accept(self, processor: 'ResultProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_emergency_stop_result(self)
 
 
@@ -137,5 +147,6 @@ class MessageReportCommandResult(CommandResult):
 
     command: Optional[MessageReportCommandDescriptor] = None
 
-    def accept(self, processor: 'ResultProcessor'):
+    def accept(self, processor: 'ResultProcessor') -> Any:
+        """Used visitor pattern double dispatch."""
         return processor.process_message_report_result(self)

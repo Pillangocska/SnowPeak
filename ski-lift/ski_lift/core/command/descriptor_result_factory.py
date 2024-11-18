@@ -38,7 +38,7 @@ class DescriptorResultFactory(DescriptorProcessor):
         return result
 
     def process_descriptor_universally(self, descriptor: CommandDescriptor) -> Any:
-        pass
+        """Empty implementation since no universal needed."""
 
     def process_insert_card_descriptor(self, descriptor: InsertCardCommandDescriptor) -> InsertCardCommandResult:
         return InsertCardCommandResult(command=descriptor)
@@ -58,5 +58,5 @@ class DescriptorResultFactory(DescriptorProcessor):
     def process_emergency_stop_descriptor(self, descriptor: EmergencyStopCommandDescriptor) -> EmergencyStopCommandResult:
         return EmergencyStopCommandResult(command=descriptor)
 
-    def process_message_report_descriptor(self, descriptor: MessageReportCommandDescriptor) -> Any:
+    def process_message_report_descriptor(self, descriptor: MessageReportCommandDescriptor) -> MessageReportCommandResult:
         return MessageReportCommandResult(command=descriptor)

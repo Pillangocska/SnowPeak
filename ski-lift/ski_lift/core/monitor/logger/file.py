@@ -20,12 +20,11 @@ class FileCommandLogger(BaseCommandLogger):
 
     def __init__(
         self,
-        descriptor_serializer: BaseDescriptorSerializer,
         result_serializer: BaseResultSerializer,
     ) -> None:
         self._init_time = datetime.now()
         os.makedirs('logs', exist_ok=True)
-        super().__init__(descriptor_serializer=descriptor_serializer, result_serializer=result_serializer)
+        super().__init__(result_serializer=result_serializer)
 
     @property
     def file_name(self) -> str:
