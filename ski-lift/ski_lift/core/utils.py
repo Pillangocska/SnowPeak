@@ -2,7 +2,6 @@
 
 import os
 import sys
-from datetime import datetime
 from typing import Any, Optional
 
 from camel_converter import to_snake
@@ -25,19 +24,6 @@ def get_lift_id_or_exit() -> str:
             print('Usage: python -m ski_lift <lift_id>')
             exit(1)
     return lift_id
-
-
-def datetime_parser(data):
-    """Object hook for json module thats parser iso strings to datetime."""
-    for key, value in data.items():
-        if isinstance(value, str):
-            try:
-                # Try to parse ISO 8601 format
-                data[key] = datetime.fromisoformat(value)
-            except ValueError:
-                # If parsing fails, keep the original value
-                pass
-    return data
 
 
 def class_name_to_snake(cls: Any, to_remove: Optional[str] = None) -> str:

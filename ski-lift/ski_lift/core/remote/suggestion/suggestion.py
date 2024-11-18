@@ -4,11 +4,9 @@ import datetime
 import json
 from dataclasses import dataclass
 from enum import Enum
-from re import M
 
 from camel_converter import dict_to_snake
 
-from ski_lift.core.utils import datetime_parser
 
 
 class SuggestionCategory(Enum):
@@ -16,16 +14,6 @@ class SuggestionCategory(Enum):
     INFO = 'INFO'
     WARNING = 'WARNING'
     DANGER = 'DANGER'
-
-
-def suggestion_category_parser(data):
-    for key, value in data.items():
-        if isinstance(value, str):
-            try:
-                data[key] = SuggestionCategory(value)
-            except ValueError:
-                pass
-    return data
 
 
 @dataclass(kw_only=True)
@@ -68,9 +56,4 @@ class Suggestion:
         
     @classmethod
     def from_json(cls, json_str: str) -> 'Suggestion':
-        return cls.from_dict(dict_to_snake(
-            json.loads(
-                json_str,
-                object_hook=lambda data: datetime_parser(suggestion_category_parser(data)))
-            )
-        )
+        return cls.from_dict(dict_to_snake(json.loads(json_str)))
