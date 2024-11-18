@@ -40,6 +40,8 @@ kubectl get configmaps
 kubectl describe configmap <configm-name>
 # get URLs for all exposed services
 minikube service list
+# get URL for a specific service
+minikube service keycloak --url
 # get minikube ip
 minikube ip
 # see dashboard:
