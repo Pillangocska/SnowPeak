@@ -146,7 +146,7 @@ services:
 
   keycloak:
     build: .
-    container_name: snow-peak-keycloak
+    container_name: keycloak
     ports:
       - ${KEYCLOAK_EXTERNAL_PORT}:${KEYCLOAK_INTERNAL_PORT}
     environment:

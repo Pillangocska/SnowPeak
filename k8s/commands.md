@@ -29,6 +29,7 @@ kubectl apply -f resources.yaml
 kubectl get all
 # get logs for pod:
 kubectl logs <pod-name>
+kubectl logs -l app=keycloak
 # shell into container:
 kubectl exec -it <pod-name> -- /bin/bash
 # delete resources
