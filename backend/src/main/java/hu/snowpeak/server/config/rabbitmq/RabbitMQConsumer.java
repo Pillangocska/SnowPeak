@@ -13,15 +13,13 @@ import org.springframework.stereotype.Component;
 
 import java.io.StringReader;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class RabbitMQConsumer {
     private static final String QUEUE_NAME = "snow-peak-queue";
 
-    HashMap<UUID, Double> temperatures = new HashMap<>();
+    HashMap<UUID, ArrayList<Double>> temperatures = new HashMap<>();
 
     @Autowired
     private LogRepository logRepository;
@@ -32,7 +30,7 @@ public class RabbitMQConsumer {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @RabbitListener(queues = "#{queue.name}")  
+    @RabbitListener(queues = "#{queue.name}")
     public void receiveMessage(
             String message,
             @Header(value = AmqpHeaders.RECEIVED_ROUTING_KEY, required = false) String routingKey) {
@@ -76,6 +74,8 @@ public class RabbitMQConsumer {
         }
 
         try{
+            ArrayList<Double> tmpList = new ArrayList<>();
+
             ObjectMapper objectMapper = new ObjectMapper();
 
             // Convert JSON string to a Map
@@ -83,9 +83,11 @@ public class RabbitMQConsumer {
 
             if(map.get("type").equals("temperature") && liftUuid != null) {
                 double newTemperature = Double.parseDouble(map.get("value").toString());
+                int index = 0;
+                index = map.get("location").equals("base") ? 0 : 1;
                 if(temperatures.containsKey(liftUuid)) {
 
-                    if(isMoreThan5PercentDifferent(temperatures.get(liftUuid), newTemperature)){
+                    if(isMoreThanPercentDifferent(temperatures.get(liftUuid).get(index), newTemperature, 0.5)){
 
                         System.out.println("WARN!! Invalid temperature value!");
 
@@ -98,7 +100,7 @@ public class RabbitMQConsumer {
                         suggestion.put("message", String.format(
                                 "Invalid temperature value detected: %f. Previous value: %f",
                                 newTemperature,
-                                temperatures.get(liftUuid)
+                                temperatures.get(liftUuid).get(index)
                         ));
 
                         // Convert suggestion to JSON string
@@ -110,11 +112,22 @@ public class RabbitMQConsumer {
                         rabbitMQProducer.sendSuggestion(suggestionString, liftUuid.toString());
                     }
                     else {
-                        temperatures.replace(liftUuid, newTemperature);
+                        tmpList.clear();
+                        tmpList = temperatures.get(liftUuid);
+                        temperatures.get(liftUuid).clear();
+                        for(int i = 0; i < tmpList.size(); i++) {
+                            if(i != index) {
+                                temperatures.get(liftUuid).add(tmpList.get(i));
+                            }
+                            else {
+                                temperatures.get(liftUuid).add(newTemperature);
+                            }
+                        }
                     }
                 }
                 else {
-                    temperatures.put(liftUuid, newTemperature);
+                    tmpList.add(index, newTemperature);
+                    temperatures.put(liftUuid, tmpList);
                 }
             }
         } catch (Exception e) {
@@ -130,9 +143,12 @@ public class RabbitMQConsumer {
         return parts.length > 1 ? parts[1] : null;
     }
 
-    private static boolean isMoreThan5PercentDifferent(double baseValue, double compareValue) {
-        double threshold = baseValue * 0.05;
+    private static boolean isMoreThanPercentDifferent(double baseValue, double compareValue, double precent) {
+        baseValue = Math.abs(baseValue);
+        compareValue = Math.abs(compareValue);
 
-        return Math.abs(baseValue - compareValue) > threshold;
+        double threshold = baseValue * (precent / 100);
+
+        return baseValue + threshold < compareValue || baseValue - threshold > compareValue;
     }
 }
