@@ -14,6 +14,7 @@
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)]()
 [![Postgres](https://img.shields.io/badge/Postgres-%23316192.svg?logo=postgresql&logoColor=white)](#)
 [![Anaconda](https://img.shields.io/badge/Anaconda-44A833?logo=anaconda&logoColor=fff)](#)
+[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)](#)
 [![Angular](https://img.shields.io/badge/Angular-%23DD0031.svg?logo=angular&logoColor=white)](#)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&logoColor=fff)](#)
 
@@ -26,7 +27,7 @@ Before installation, ensure you have the following dependencies installed:
 
 - Kubernetes cluster or Minikube (v1.20+)
 - kubectl CLI tool
-- Container runtime (Docker, containerd, or CRI-O)
+- Container runtime (preferably Docker)
 - Operating System: Windows 10/11 or any modern UNIX based OS
 
 ## Installation
@@ -47,6 +48,10 @@ Before installation, ensure you have the following dependencies installed:
    **Linux/macOS**:
    ```bash
    ./k8s/start_on_unix_based.sh
+   ```
+   **Docker Compose**
+   ```bash
+   docker-compose up -d --build
    ```
 
 ## Documentation
