@@ -95,6 +95,7 @@ class CommandLineInterfaceView(BaseView):
         except KeyboardInterrupt:
             self._stopped = True
             print('Exiting...')
+            print('Closing connections ...')
 
     def start_handling_cli_input(self) -> None:
         print(self.welcome_text)
@@ -122,6 +123,8 @@ class CommandLineInterfaceView(BaseView):
                 )
             except Exception as exc:
                 print(f'Incorrect arguments for command "{command_name}". Type "help" to display correct usage.')
+            self._stopped = True
+
     def set_suggestion_level(self, level: str):
         match(level.upper()):
             case 'INFO': self._suggestion_level = ['INFO', 'WARNING', 'DANGER']

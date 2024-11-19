@@ -62,7 +62,7 @@ def create_controller(lift_id: str, producer: PikaProducer) -> Controller:
     """Create a controller with an authorizer."""
     return SkiLiftController(
         lift_id=lift_id,
-        engine=Engine(),
+        engine=Engine(state=os.environ.get('SKI_LIFT_START_STATE', 'FULL_STEAM')),
         authorizer=SkiLiftAuthorizer(authenticator=create_authenticate_from_env()),
         remote_communicator=RabbitMQCommunicator(producer=producer),
         queue_status=create_erlang_c_model(),
