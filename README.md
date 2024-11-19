@@ -53,6 +53,77 @@ Before installation, ensure you have the following dependencies installed:
    ```bash
    docker-compose up -d --build
    ```
+## Architecture
+
+```mermaid
+graph TB
+    %% External Access
+    User(("👤 User"))
+    Admin(("👤 Admin"))
+
+    %% Frontend
+    FrontendLB[Frontend LoadBalancer]
+    Frontend[Frontend Service]
+
+    %% Backend Services
+    Backend[Backend Service]
+
+    %% Message Broker
+    RabbitMQLB[RabbitMQ LoadBalancer]
+    RabbitMQ[RabbitMQ Service]
+
+    %% Authentication
+    KeycloakLB[Keycloak LoadBalancer]
+    Keycloak[Keycloak Service]
+    KeycloakDB[(Keycloak PostgreSQL)]
+
+    %% Application Database
+    AppDB[(Application PostgreSQL)]
+
+    %% Ski Lifts
+    Lift1[Ski Lift 1]
+    Lift2[Ski Lift 2]
+    Lift3[Ski Lift 3]
+
+    %% Persistent Storage
+    Storage{{Persistent Storage}}
+
+    %% Connections
+    User --> FrontendLB
+    Admin --> FrontendLB
+    FrontendLB --> Frontend
+    Frontend --> Backend
+    Frontend -.-> RabbitMQ
+    Backend --> AppDB
+    Backend --> RabbitMQ
+    Backend --> Keycloak
+
+    Lift1 --> RabbitMQ
+    Lift2 --> RabbitMQ
+    Lift3 --> RabbitMQ
+
+    KeycloakLB --> Keycloak
+    Keycloak --> KeycloakDB
+
+    RabbitMQLB --> RabbitMQ
+    RabbitMQ --> Storage
+
+    AppDB --> Storage
+    KeycloakDB --> Storage
+
+    %% Styles
+    classDef loadbalancer fill:#f9f,stroke:#333,stroke-width:2px,color:black
+    classDef service fill:#bbf,stroke:#333,stroke-width:2px,color:black
+    classDef database fill:#fbb,stroke:#333,stroke-width:2px,color:black
+    classDef storage fill:#bfb,stroke:#333,stroke-width:2px,color:black
+    classDef lift fill:#ffb,stroke:#333,stroke-width:2px,color:black
+
+    class FrontendLB,RabbitMQLB,KeycloakLB loadbalancer
+    class Frontend,Backend,RabbitMQ,Keycloak service
+    class AppDB,KeycloakDB database
+    class Storage storage
+    class Lift1,Lift2,Lift3 lift
+```
 
 ## Documentation
 
