@@ -112,11 +112,11 @@ graph TB
     KeycloakDB --> Storage
 
     %% Styles
-    classDef loadbalancer fill:#f9f,stroke:#333,stroke-width:2px
-    classDef service fill:#bbf,stroke:#333,stroke-width:2px
-    classDef database fill:#fbb,stroke:#333,stroke-width:2px
-    classDef storage fill:#bfb,stroke:#333,stroke-width:2px
-    classDef lift fill:#ffb,stroke:#333,stroke-width:2px
+    classDef loadbalancer fill:#f9f,stroke:#333,stroke-width:2px,color:black
+    classDef service fill:#bbf,stroke:#333,stroke-width:2px,color:black
+    classDef database fill:#fbb,stroke:#333,stroke-width:2px,color:black
+    classDef storage fill:#bfb,stroke:#333,stroke-width:2px,color:black
+    classDef lift fill:#ffb,stroke:#333,stroke-width:2px,color:black
 
     class FrontendLB,RabbitMQLB,KeycloakLB loadbalancer
     class Frontend,Backend,RabbitMQ,Keycloak service
