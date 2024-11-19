@@ -4,13 +4,15 @@ import sys
 import pika
 import os
 import json
-
+import pika.exceptions
+from retry import retry
 
 def callback(channel, method, properties, body):
     print(json.dumps(json.loads(body.decode('utf-8')), indent=4))
     print()
 
 
+@retry(pika.exceptions.AMQPError, delay=5)
 def main() -> int:
     if len(sys.argv) < 3:
         print('Usage: consume.py <exchange_name> <routing_key>')
@@ -18,7 +20,8 @@ def main() -> int:
     
     exchange_name = sys.argv[1]
     routing_key = sys.argv[2]
-    
+
+    print('connecting...')    
     connection = pika.BlockingConnection(
         parameters=pika.ConnectionParameters(
             host=os.environ.get('RABBITMQ_HOST', 'localhost'),
@@ -37,6 +40,8 @@ def main() -> int:
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)    
 
     try:
+        print('start consuming ...')
+        print('CTRL + C to stop')
         channel.start_consuming()
     except KeyboardInterrupt:
         channel.stop_consuming()
