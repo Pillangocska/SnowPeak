@@ -7,9 +7,10 @@ from ski_lift.core.command.command_panel import CommandPanel
 from ski_lift.core.controller import Controller
 from ski_lift.core.monitor.result.result_monitor import CommandResultMonitor
 from ski_lift.core.remote.suggestion.suggestion import Suggestion
+from ski_lift.core.remote.rabbitmq.connection_event_observer import ConnectionEventObserver
 
 
-class BaseView(CommandPanel, CommandResultMonitor):
+class BaseView(CommandPanel, CommandResultMonitor, ConnectionEventObserver):
     """Base view.
     
     Abstract base class for views.

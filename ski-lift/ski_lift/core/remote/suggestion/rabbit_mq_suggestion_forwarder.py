@@ -21,6 +21,7 @@ class RabbitMQSuggestionForwarder(SuggestionForwarder):
             exchange_type='direct',
             lift_id=view.lift_id,
             callback=self.suggestion_callback,
+            observer=view,
         )
         super().__init__(view=view)
 

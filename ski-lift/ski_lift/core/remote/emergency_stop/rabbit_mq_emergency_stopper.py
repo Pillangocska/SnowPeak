@@ -29,6 +29,7 @@ class RabbitMQEmergencyStopHandler(RemoteEmergencyStopHandler):
             exchange_type='direct',
             lift_id=view.lift_id,
             callback=self.emergency_stop_callback,
+            observer=view,
         )
         super().__init__(view=view)
 

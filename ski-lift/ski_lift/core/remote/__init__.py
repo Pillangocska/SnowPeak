@@ -1,4 +1,4 @@
 from .communicator import RabbitMQCommunicator, RemoteCommunicator
 from .emergency_stop import RabbitMQEmergencyStopHandler
-from .rabbitmq import PikaConsumer, PikaProducer
+from .rabbitmq import PikaConsumer, PikaProducer, ConnectionEventObserver
 from .suggestion import RabbitMQSuggestionForwarder
