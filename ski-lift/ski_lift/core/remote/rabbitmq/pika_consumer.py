@@ -3,17 +3,13 @@
 import functools
 import logging
 import time
-from ast import Call
 from threading import Event, Thread
-from typing import Callable
+from typing import Callable, Optional, overload
 
 import pika
 from pika.connection import ConnectionParameters
 from pika.exchange_type import ExchangeType
-
-LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) '
-              '-35s %(lineno) -5d: %(message)s')
-LOGGER = logging.getLogger(__name__)
+from ski_lift.core.remote.rabbitmq.connection_event_observer import ConnectionEventObserver
 
 
 class ExampleConsumer(object):
@@ -37,6 +33,7 @@ class ExampleConsumer(object):
         route_key: str,
         connection_parameters: ConnectionParameters,
         callback: callable,
+        observer: Optional[ConnectionEventObserver] = None,
     ):
         self._exchange = exchange
         self._exchange_type = exchange_type
@@ -55,6 +52,7 @@ class ExampleConsumer(object):
         # for higher consumer throughput
         self._prefetch_count = 1
         self._callback: Callable = callback
+        self._observer = observer
         self._queue: str = None
 
     def connect(self):
@@ -75,9 +73,8 @@ class ExampleConsumer(object):
     def close_connection(self):
         self._consuming = False
         if self._connection.is_closing or self._connection.is_closed:
-            LOGGER.info('Connection is closing or already closed')
+            pass
         else:
-            LOGGER.info('Closing connection')
             self._connection.close()
 
     def on_connection_open(self, _unused_connection):
@@ -88,7 +85,6 @@ class ExampleConsumer(object):
         :param pika.SelectConnection _unused_connection: The connection
 
         """
-        LOGGER.info('Connection opened')
         self.open_channel()
 
     def on_connection_open_error(self, _unused_connection, err):
@@ -99,6 +95,8 @@ class ExampleConsumer(object):
         :param Exception err: The error
 
         """
+        if self._observer is not None:
+            self._observer.on_connected_error(self._exchange)
         self.reconnect()
 
     def on_connection_closed(self, _unused_connection, reason):
@@ -115,7 +113,6 @@ class ExampleConsumer(object):
         if self._closing:
             self._connection.ioloop.stop()
         else:
-            LOGGER.warning('Connection closed, reconnect necessary: %s', reason)
             self.reconnect()
 
     def reconnect(self):
@@ -133,7 +130,6 @@ class ExampleConsumer(object):
         on_channel_open callback will be invoked by pika.
 
         """
-        LOGGER.info('Creating a new channel')
         self._connection.channel(on_open_callback=self.on_channel_open)
 
     def on_channel_open(self, channel):
@@ -145,7 +141,8 @@ class ExampleConsumer(object):
         :param pika.channel.Channel channel: The channel object
 
         """
-        LOGGER.info('Channel opened')
+        if self._observer is not None:
+            self._observer.on_connected(self._exchange)
         self._channel = channel
         self.add_on_channel_close_callback()
         self.setup_exchange(self._exchange)
@@ -155,7 +152,6 @@ class ExampleConsumer(object):
         RabbitMQ unexpectedly closes the channel.
 
         """
-        LOGGER.info('Adding channel close callback')
         self._channel.add_on_close_callback(self.on_channel_closed)
 
     def on_channel_closed(self, channel, reason):
@@ -169,7 +165,8 @@ class ExampleConsumer(object):
         :param Exception reason: why the channel was closed
 
         """
-        LOGGER.warning('Channel %i was closed: %s', channel, reason)
+        if self._observer is not None:
+            self._observer.on_closed(self._exchange)
         self.close_connection()
 
     def setup_exchange(self, exchange_name):
@@ -180,7 +177,6 @@ class ExampleConsumer(object):
         :param str|unicode exchange_name: The name of the exchange to declare
 
         """
-        LOGGER.info('Declaring exchange: %s', exchange_name)
         # Note: using functools.partial is not required, it is demonstrating
         # how arbitrary data can be passed to the callback when it is called
         cb = functools.partial(
@@ -200,7 +196,6 @@ class ExampleConsumer(object):
         :param str|unicode userdata: Extra user data (exchange name)
 
         """
-        LOGGER.info('Exchange declared: %s', userdata)
         self.setup_queue()
 
     def setup_queue(self):
@@ -270,7 +265,6 @@ class ExampleConsumer(object):
         will invoke when a message is fully received.
 
         """
-        LOGGER.info('Issuing consumer related RPC commands')
         self.add_on_cancel_callback()
         self._consumer_tag = self._channel.basic_consume(self._queue, self.on_message)
         self.was_consuming = True
@@ -282,7 +276,6 @@ class ExampleConsumer(object):
         on_consumer_cancelled will be invoked by pika.
 
         """
-        LOGGER.info('Adding consumer cancellation callback')
         self._channel.add_on_cancel_callback(self.on_consumer_cancelled)
 
     def on_consumer_cancelled(self, method_frame):
@@ -292,8 +285,6 @@ class ExampleConsumer(object):
         :param pika.frame.Method method_frame: The Basic.Cancel frame
 
         """
-        LOGGER.info('Consumer was cancelled remotely, shutting down: %r',
-                    method_frame)
         self._channel.close()
 
     def on_message(self, channel, basic_deliver, properties, body):
@@ -320,7 +311,6 @@ class ExampleConsumer(object):
         :param int delivery_tag: The delivery tag from the Basic.Deliver frame
 
         """
-        LOGGER.info('Acknowledging message %s', delivery_tag)
         self._channel.basic_ack(delivery_tag)
 
     def stop_consuming(self):
@@ -329,7 +319,6 @@ class ExampleConsumer(object):
 
         """
         if self._channel:
-            LOGGER.info('Sending a Basic.Cancel RPC command to RabbitMQ')
             cb = functools.partial(
                 self.on_cancelok, userdata=self._consumer_tag)
             self._channel.basic_cancel(self._consumer_tag, cb)
@@ -345,9 +334,6 @@ class ExampleConsumer(object):
 
         """
         self._consuming = False
-        LOGGER.info(
-            'RabbitMQ acknowledged the cancellation of the consumer: %s',
-            userdata)
         self.close_channel()
 
     def close_channel(self):
@@ -355,7 +341,6 @@ class ExampleConsumer(object):
         Channel.Close RPC command.
 
         """
-        LOGGER.info('Closing the channel')
         self._channel.close()
 
     def run(self):
@@ -379,12 +364,10 @@ class ExampleConsumer(object):
         """
         if not self._closing:
             self._closing = True
-            LOGGER.info('Stopping')
             if self._consuming:
                 self.stop_consuming()
             elif self._connection is not None:
                 self._connection.ioloop.stop()
-            LOGGER.info('Stopped')
 
 
 class PikaConsumer(object):
@@ -400,6 +383,7 @@ class PikaConsumer(object):
         route_key: str,
         connection_parameters: ConnectionParameters,
         callback: Callable,
+        observer: Optional[ConnectionEventObserver] = None,
     ):
         self._reconnect_delay = 0
     
@@ -408,8 +392,9 @@ class PikaConsumer(object):
         self._route_key = route_key
         self._connection_parameters = connection_parameters
         self._callback = callback
+        self._observer = observer
 
-        self._consumer = ExampleConsumer(exchange, exchange_type, route_key, connection_parameters, callback)
+        self._consumer = ExampleConsumer(exchange, exchange_type, route_key, connection_parameters, callback, observer)
         self._thread = None
         self._stop_event = None
 
@@ -438,10 +423,9 @@ class PikaConsumer(object):
         if self._consumer.should_reconnect:
             self._consumer.stop()
             reconnect_delay = self._get_reconnect_delay()
-            LOGGER.info('Reconnecting after %d seconds', reconnect_delay)
             time.sleep(reconnect_delay)
             self._consumer = ExampleConsumer(
-                self._exchange, self._exchange_type, self._route_key, self._connection_parameters, self._callback
+                self._exchange, self._exchange_type, self._route_key, self._connection_parameters, self._callback, self._observer
             )
 
     def _get_reconnect_delay(self):

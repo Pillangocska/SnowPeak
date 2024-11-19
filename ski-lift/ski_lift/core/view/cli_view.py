@@ -14,10 +14,11 @@ from ski_lift.core.command.result.object import (AbortCommandResult,
                                                  InsertCardCommandResult,
                                                  RemoveCardCommandResult,
                                                  MessageReportCommandResult)
-from ski_lift.core.remote.suggestion.suggestion import Suggestion
+from ski_lift.core.remote.suggestion.suggestion import Suggestion, SuggestionCategory
 from ski_lift.core.view.base_view import BaseView
 
 from ski_lift.core.controller import Controller
+from datetime import datetime
 
 DEFAULT_HELP_TEXT: str = """
 [yellow]Available commands:
@@ -68,6 +69,8 @@ lift id: [orange3]$lift_id$current_user[/orange3]
 class CommandLineInterfaceView(BaseView):
 
     def __init__(self, controller: Controller, *args, **kwargs) -> None:
+        self._stopped = False
+        self._connection_error_count = 0
         self._suggestion_level: str = ['INFO', 'WARNING', 'DANGER']
         super().__init__(controller, *args, **kwargs)
 
@@ -90,7 +93,9 @@ class CommandLineInterfaceView(BaseView):
         try:
             self.start_handling_cli_input()
         except KeyboardInterrupt:
+            self._stopped = True
             print('Exiting...')
+            print('Closing connections ...')
 
     def start_handling_cli_input(self) -> None:
         print(self.welcome_text)
@@ -118,6 +123,8 @@ class CommandLineInterfaceView(BaseView):
                 )
             except Exception as exc:
                 print(f'Incorrect arguments for command "{command_name}". Type "help" to display correct usage.')
+            self._stopped = True
+
     def set_suggestion_level(self, level: str):
         match(level.upper()):
             case 'INFO': self._suggestion_level = ['INFO', 'WARNING', 'DANGER']
@@ -145,7 +152,7 @@ class CommandLineInterfaceView(BaseView):
         self.handle_result(result, 'ENGINE STOPPED')
 
     def process_message_report_result(self, result: MessageReportCommandResult) -> Any:
-        self.handle_result(result, 'REPORT SENT')
+        self.handle_result(result, 'REPORT SENT' if self._connection_error_count == 0 else 'REPORT PENDING')
 
     def handle_result(self, result: CommandResult, message_on_success: str):
         if result.outcome == CommandResult.OutCome.DELAYED:
@@ -158,9 +165,47 @@ class CommandLineInterfaceView(BaseView):
         if result.command.delay != 0:
             print('\n> ', end='')
 
+    def on_connected(self, exchange: str):
+        self._connection_error_count = 0
+        self.display_suggestion(
+            Suggestion(
+                sender_card_number='system',
+                time=datetime.now(),
+                category=SuggestionCategory.INFO,
+                message=f'Connected to "{exchange}" channel.',
+            ),
+        )
+
+    def on_closed(self, exchange: str):
+        self.display_suggestion(
+            Suggestion(
+                sender_card_number='system',
+                time=datetime.now(),
+                category=SuggestionCategory.WARNING,
+                message=f'Connection to "{exchange}" was closed.',
+            ),
+        )
+
+    def on_connected_error(self, exchange: str):
+        if self._connection_error_count < 2:
+            self.display_suggestion(
+                Suggestion(
+                    sender_card_number='system',
+                    time=datetime.now(),
+                    category=SuggestionCategory.WARNING,
+                    message=f'Could not connect "{exchange}" channel.',
+                ),
+            )
+        self._connection_error_count += 1
+
+
     def display_suggestion(self, suggestion: Suggestion, reset_input: bool = True) -> None:
-        if suggestion.category.name in self._suggestion_level:
+        if self._should_display_suggestion(suggestion):
             print()
             print(suggestion.as_rich_text)
             if reset_input:
                 print('\n> ', end='')
+
+    def _should_display_suggestion(self, suggestion: Suggestion):
+        severity_is_allowed: bool = suggestion.category.name in self._suggestion_level
+        return severity_is_allowed and not self._stopped

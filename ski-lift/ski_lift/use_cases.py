@@ -2,7 +2,7 @@
 
 import os
 from threading import Thread
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 import pika
 
@@ -18,7 +18,7 @@ from ski_lift.core.math.erlang_c import ErlangCModel
 from ski_lift.core.monitor.logger import (FileCommandLogger,
                                           RabbitMQCommandLogger)
 from ski_lift.core.remote import (PikaConsumer, PikaProducer,
-                                  RabbitMQCommunicator)
+                                  RabbitMQCommunicator, ConnectionEventObserver)
 from ski_lift.core.sensor import RabbitMQObserver, SensorDataGenerator
 
 
@@ -62,7 +62,7 @@ def create_controller(lift_id: str, producer: PikaProducer) -> Controller:
     """Create a controller with an authorizer."""
     return SkiLiftController(
         lift_id=lift_id,
-        engine=Engine(),
+        engine=Engine(state=os.environ.get('SKI_LIFT_START_STATE', 'FULL_STEAM')),
         authorizer=SkiLiftAuthorizer(authenticator=create_authenticate_from_env()),
         remote_communicator=RabbitMQCommunicator(producer=producer),
         queue_status=create_erlang_c_model(),
@@ -125,14 +125,19 @@ def setup_sensor(lift_id: str, pika_producer:PikaProducer) -> None:
 
 
 def create_pika_consumer(
-        exchange_name: str, exchange_type: str, lift_id: str, callback: Callable,
-    ) -> PikaConsumer:
+    exchange_name: str,
+    exchange_type: str,
+    lift_id: str,
+    callback: Callable,
+    observer: Optional[ConnectionEventObserver] = None,
+) -> PikaConsumer:
     return PikaConsumer(
         exchange=exchange_name,
         exchange_type=exchange_type,
         route_key=lift_id,
         connection_parameters=create_pika_connection_parameters(),
         callback=callback,
+        observer=observer,
     )
 
 

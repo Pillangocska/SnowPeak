@@ -1,2 +1,3 @@
 from .pika_consumer import PikaConsumer
 from .pika_producer import PikaProducer
+from .connection_event_observer import ConnectionEventObserver
