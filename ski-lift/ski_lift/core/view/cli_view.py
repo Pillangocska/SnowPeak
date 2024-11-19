@@ -101,6 +101,8 @@ class CommandLineInterfaceView(BaseView):
         print(self.welcome_text)
         while True:
             user_input = input('\n> ').lower().split()
+            if not user_input:
+                continue
             command_name = user_input[0]
             args = user_input[1:]
 
@@ -123,7 +125,7 @@ class CommandLineInterfaceView(BaseView):
                 )
             except Exception as exc:
                 print(f'Incorrect arguments for command "{command_name}". Type "help" to display correct usage.')
-            self._stopped = True
+        self._stopped = True
 
     def set_suggestion_level(self, level: str):
         match(level.upper()):
