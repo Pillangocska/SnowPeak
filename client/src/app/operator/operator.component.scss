@@ -27,7 +27,6 @@
 
     .log-card {
         flex: 1;
-        // height: inherit;
         overflow: hidden;
         padding: 4px;
 
@@ -42,12 +41,13 @@
         overflow-y: scroll;
         height: inherit;
         border-bottom-left-radius: 12px;
-    
-        .log-line {
-            margin: 0;
-            padding: 8px 0;
-            
-            &:nth-child(even) {
+
+        table {
+            .header-row {
+                height: 0;
+            }
+
+            tr:nth-child(even) {
                 background-color: rgb(213, 213, 213);
             
             }

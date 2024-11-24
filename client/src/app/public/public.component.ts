@@ -40,7 +40,6 @@ export class PublicComponent implements OnInit, AfterViewInit {
     this.rabbitMqService
       .watchPublicLiftsMessages()
       .subscribe((publicLiftMessage) => {
-        console.log(publicLiftMessage);
         this.publicMessages.unshift(publicLiftMessage);
         this.drawLifts();
       });
@@ -76,7 +75,6 @@ export class PublicComponent implements OnInit, AfterViewInit {
   }
 
   drawLifts(): void {
-    console.log(this.lifts);
     this.lifts?.forEach((lift) => {
       if (lift.id) {
         this.clearLiftLayers(lift.id);
@@ -100,8 +98,6 @@ export class PublicComponent implements OnInit, AfterViewInit {
       const messageBody = latestLiftPublicMessage?.body
         ? JSON.parse(latestLiftPublicMessage?.body)
         : undefined;
-
-      console.log(messageBody);
 
       var lineColor = 'grey';
 

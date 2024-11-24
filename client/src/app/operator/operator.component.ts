@@ -17,6 +17,8 @@ import { LiftControllerService, LogControllerService } from '../api/services';
 import { RxStompService } from '../rx-stomp.service';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTableModule } from '@angular/material/table';
 import { EmergencyStopDialogComponent } from '../shared/components/emergency-stop-dialog/emergency-stop-dialog.component';
 import { Subscription } from 'rxjs';
 import { RabbitmqService } from '../shared/services/rabbitmq.service';
@@ -37,6 +39,8 @@ import { PublicComponent } from '../public/public.component';
     MatDialogModule,
     StatusPipe,
     PublicComponent,
+    MatTooltipModule,
+    MatTableModule,
   ],
   templateUrl: './operator.component.html',
   styleUrl: './operator.component.scss',
@@ -61,34 +65,43 @@ export class OperatorComponent implements OnInit {
   liftStatusSubscription?: Subscription;
   liftCommandSubscription?: Subscription;
 
-  lifts?: Array<PrivateLiftResponseModel>;
+  sensorDisplayedColumns: string[] = ['timestamp', 'location', 'value'];
+  commandDisplayedColumns: string[] = [
+    'timestamp',
+    'type',
+    'user',
+    'outcome',
+    'args',
+  ];
+  temperatureDataSource: any[] = [];
+  windDataSource: any[] = [];
+  commandDataSource: any[] = [];
+
+  lifts?: Array<PrivateLiftResponseModel & { liftName: string }>;
   selectedLiftId?: string;
 
   operatorId?: string;
 
   liftStatus?: 'FULL_STEAM' | 'HALF_STEAM' | 'STOPPED';
 
-  temperatureLogs: string[] = [];
-  windLogs: string[] = [];
-  commands: string[] = [];
-
   message?: string;
 
   ngOnInit(): void {
-    this.keycloakService.getToken().then((val) => console.log(val));
-
-    console.log(this.internalKeycloakService.getUserId());
-
     this.operatorId = this.internalKeycloakService.getUserId();
     this.liftService
       .getPrivateLiftsByOperatorId({
         operatorId: this.operatorId ?? '',
       })
-      .subscribe((lifts) => (this.lifts = lifts));
+      .subscribe(
+        (lifts) =>
+          (this.lifts = lifts.map((lift, idx) => ({
+            liftName: `Lift ${idx + 1}`,
+            ...lift,
+          }))),
+      );
   }
 
   private watchSelectedLiftTemperatureSensors(): void {
-    console.log(this.selectedLiftId);
     this.liftTemperatureSensorSubscription?.unsubscribe();
     this.liftTemperatureSensorSubscription = undefined;
 
@@ -96,9 +109,8 @@ export class OperatorComponent implements OnInit {
       this.liftTemperatureSensorSubscription = this.rabbitMqService
         .watchTemperatureSensorsByLiftId(this.selectedLiftId)
         .subscribe((message: any) => {
-          console.log(JSON.parse(message.body));
-          this.temperatureLogs = [
-            ...this.temperatureLogs,
+          this.temperatureDataSource = [
+            ...this.temperatureDataSource,
             JSON.parse(message.body),
           ];
           setTimeout(() => {
@@ -109,12 +121,11 @@ export class OperatorComponent implements OnInit {
           });
         });
     } else {
-      this.temperatureLogs = [];
+      this.temperatureDataSource = [];
     }
   }
 
   private watchSelectedLiftWindSensors(): void {
-    console.log(this.selectedLiftId);
     this.liftWindSensorSubscription?.unsubscribe();
     this.liftWindSensorSubscription = undefined;
 
@@ -122,19 +133,20 @@ export class OperatorComponent implements OnInit {
       this.liftWindSensorSubscription = this.rabbitMqService
         .watchWindSensorsByLiftId(this.selectedLiftId)
         .subscribe((message: any) => {
-          console.log(JSON.parse(message.body));
-          this.windLogs = [...this.windLogs, JSON.parse(message.body)];
+          this.windDataSource = [
+            ...this.windDataSource,
+            JSON.parse(message.body),
+          ];
           setTimeout(() => {
             this.scrollToBottom(false, this.windLogContainer.nativeElement);
           });
         });
     } else {
-      this.windLogs = [];
+      this.windDataSource = [];
     }
   }
 
   private watchSelectedLiftStatus(): void {
-    console.log(this.selectedLiftId);
     this.liftStatusSubscription?.unsubscribe();
     this.liftStatusSubscription = undefined;
 
@@ -142,7 +154,6 @@ export class OperatorComponent implements OnInit {
       this.liftStatusSubscription = this.rabbitMqService
         .watchPublicLiftsMessagesByLiftId(this.selectedLiftId)
         .subscribe((message: any) => {
-          console.log(JSON.parse(message.body));
           this.liftStatus = JSON.parse(message?.body)?.skiLiftState;
         });
     } else {
@@ -151,7 +162,6 @@ export class OperatorComponent implements OnInit {
   }
 
   private watchSelectedLiftCommands(): void {
-    console.log(this.selectedLiftId);
     this.liftCommandSubscription?.unsubscribe();
     this.liftCommandSubscription = undefined;
 
@@ -159,14 +169,16 @@ export class OperatorComponent implements OnInit {
       this.liftCommandSubscription = this.rabbitMqService
         .watchCommandsByLiftId(this.selectedLiftId)
         .subscribe((command: any) => {
-          console.log(JSON.parse(command.body));
-          this.commands = [...this.commands, JSON.parse(command.body)];
+          this.commandDataSource = [
+            ...this.commandDataSource,
+            JSON.parse(command.body),
+          ];
           setTimeout(() => {
             this.scrollToBottom(false, this.commandContainer.nativeElement);
           });
         });
     } else {
-      this.commands = [];
+      this.commandDataSource = [];
     }
   }
 
@@ -180,11 +192,10 @@ export class OperatorComponent implements OnInit {
   }
 
   goToLift(liftId: string) {
-    console.log(liftId);
     this.selectedLiftId = this.selectedLiftId === liftId ? undefined : liftId;
-    this.temperatureLogs = [];
-    this.windLogs = [];
-    this.commands = [];
+    this.temperatureDataSource = [];
+    this.windDataSource = [];
+    this.commandDataSource = [];
     this.liftStatus = undefined;
 
     this.watchSelectedLiftTemperatureSensors();
@@ -194,7 +205,6 @@ export class OperatorComponent implements OnInit {
   }
 
   sendMessage() {
-    console.log(this.message);
     let body: any = {};
     body.messageKind = 'suggestion';
     body.severity = 'INFO';
