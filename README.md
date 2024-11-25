@@ -1,4 +1,4 @@
-![SnowPeak](./logostuff.jpg)
+![SnowPeak](./logo.jpg)
 
 # SnowPeak: Distributed Ski Resort Monitoring System
 [![Version](https://img.shields.io/badge/version-1.0.0-informational.svg)]()
